@@ -1,0 +1,11 @@
+* type
+** well typed statement params/results
+* decoder
+* query
+** read records
+** read with decoder
+** write raw
+** decode statement result
+* model
+** model neo4j state in memory
+*** compare model with real instance
