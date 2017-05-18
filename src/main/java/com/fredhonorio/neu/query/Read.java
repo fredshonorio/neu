@@ -5,7 +5,6 @@ import com.fredhonorio.neu.type.*;
 import javaslang.Tuple;
 import javaslang.collection.*;
 import javaslang.control.Try;
-import meshapp.neu.type.*;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;

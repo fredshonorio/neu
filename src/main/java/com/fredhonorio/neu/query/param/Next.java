@@ -1,6 +1,8 @@
 package com.fredhonorio.neu.query.param;
 
+import com.fredhonorio.neu.type.NParamMap;
 import javaslang.collection.HashSet;
+import javaslang.collection.List;
 import javaslang.control.Option;
 import com.fredhonorio.neu.type.Properties;
 import com.fredhonorio.neu.query.Statement;
@@ -33,7 +35,20 @@ public interface Next {
 
     interface Final extends Fragments {
         default Statement build() {
-            return null;
+
+            List<Fragment> fragments = fragments();
+
+            String query = fragments
+                .foldLeft(
+                    "",
+                    (z, x) -> x.match(
+                        str -> str.s,
+                        Fragment.Node::pattern,
+                        Fragment.Rel::pattern
+                    )
+                );
+
+            return new Statement(query, NParamMap.empty());
         }
 
         default String show() {

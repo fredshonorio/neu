@@ -5,6 +5,7 @@ import javaslang.collection.TreeMap;
 public class Properties {
     private final TreeMap<String, Property> properties;
 
+    // TODO: sanitize key names
     public Properties(TreeMap<String, Property> properties) {
         this.properties = properties;
     }
@@ -30,6 +31,12 @@ public class Properties {
             .toList()
             .map(t -> t._1 + "=" + t._2)
             .mkString(", ");
+    }
+
+    public String pattern(String nodeName) {
+        return properties.keySet()
+            .map(key -> key + ": $" + nodeName + "." + key)
+            .mkString("{", ",", "}");
     }
 
     @Override

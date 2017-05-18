@@ -2,6 +2,8 @@ package com.fredhonorio.neu.query.param;
 
 import javaslang.collection.List;
 
+import java.util.function.Function;
+
 public class Builder implements Fragments {
 
     final List<Fragment> fragments;
@@ -57,5 +59,4 @@ public class Builder implements Fragments {
             .build()
             ;
     }
-
 }

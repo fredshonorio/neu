@@ -1,6 +1,6 @@
 package com.fredhonorio.neu.type;
 
-public class Label {
+public class Label implements Comparable<Label> {
     public final String value;
 
     private Label(String value) {
@@ -35,5 +35,10 @@ public class Label {
 
     public static String sanitize(String labelValue) {
         return labelValue;
+    }
+
+    @Override
+    public int compareTo(Label label) {
+        return this.value.compareTo(label.value);
     }
 }
