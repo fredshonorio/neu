@@ -35,4 +35,22 @@ public class Node {
     public String toString() {
         return "Node(" + describe() + ')';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        if (labels != null ? !labels.equals(node.labels) : node.labels != null) return false;
+        return properties != null ? properties.equals(node.properties) : node.properties == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = labels != null ? labels.hashCode() : 0;
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
+    }
 }

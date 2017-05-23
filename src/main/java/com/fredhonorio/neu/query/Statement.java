@@ -19,6 +19,12 @@ public class Statement {
         this.params = params;
     }
 
+    @Override
+    public String toString() {
+        return "Statement{" +
+            "queryTemplate='" + queryTemplate + '\'' +
+            ", params=" + params +
+            '}';
     }
 
     public static Statement of(String queryTemplate) {

@@ -1,5 +1,7 @@
 package com.fredhonorio.neu.type;
 
+import javaslang.collection.List;
+
 public class Label implements Comparable<Label> {
     public final String value;
 
@@ -31,6 +33,10 @@ public class Label implements Comparable<Label> {
 
     public static Label of(String value) {
         return new Label(sanitize(value));
+    }
+
+    public static List<Label> many(String...values) {
+        return List.of(values).map(Label::of);
     }
 
     public static String sanitize(String labelValue) {

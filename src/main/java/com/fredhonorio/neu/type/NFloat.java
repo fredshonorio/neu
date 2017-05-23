@@ -33,4 +33,20 @@ public class NFloat implements Property, Parameter, Primitive, Result {
     public String toString() {
         return "NFloat(" + value + ')';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NFloat nFloat = (NFloat) o;
+
+        return Double.compare(nFloat.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        long temp = Double.doubleToLongBits(value);
+        return (int) (temp ^ (temp >>> 32));
+    }
 }

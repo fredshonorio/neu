@@ -11,6 +11,7 @@ import org.neo4j.driver.v1.Values;
 
 import java.util.Map;
 
+import static com.fredhonorio.neu.type.Value.*;
 import static org.neo4j.driver.internal.types.InternalTypeSystem.TYPE_SYSTEM;
 
 public class Read {
@@ -55,11 +56,13 @@ public class Read {
 
     private static Property propValue(Value value) {
         if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
-            return com.fredhonorio.neu.type.Value.nBoolean(value.asBoolean());
+            return nBoolean(value.asBoolean());
         } else if (value.hasType(TYPE_SYSTEM.FLOAT())) {
-            return com.fredhonorio.neu.type.Value.nFloat(value.asDouble());
+            return nFloat(value.asDouble());
+        } else if (value.hasType(TYPE_SYSTEM.INTEGER())) {
+            return nInteger(value.asInt());
         } else if (value.hasType(TYPE_SYSTEM.STRING())) {
-            return com.fredhonorio.neu.type.Value.nString(value.asString());
+            return nString(value.asString());
         } else if (value.hasType(TYPE_SYSTEM.NULL())) {
             return NNull.instance;
         } else if (value.hasType(TYPE_SYSTEM.LIST())) {
@@ -71,11 +74,13 @@ public class Read {
 
     private static Primitive primValue(Value value) throws IllegalStateException {
         if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
-            return com.fredhonorio.neu.type.Value.nBoolean(value.asBoolean());
+            return nBoolean(value.asBoolean());
         } else if (value.hasType(TYPE_SYSTEM.FLOAT())) {
-            return com.fredhonorio.neu.type.Value.nFloat(value.asDouble());
+            return nFloat(value.asDouble());
+        } else if (value.hasType(TYPE_SYSTEM.INTEGER())) {
+            return nInteger(value.asInt());
         } else if (value.hasType(TYPE_SYSTEM.STRING())) {
-            return com.fredhonorio.neu.type.Value.nString(value.asString());
+            return nString(value.asString());
         } else if (value.hasType(TYPE_SYSTEM.NULL())) {
             return NNull.instance;
         } else {
@@ -93,11 +98,11 @@ public class Read {
         } else if (value.hasType(TYPE_SYSTEM.RELATIONSHIP())) { // test
             return new NRelationship(value.asRelationship());
         } else if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
-            return com.fredhonorio.neu.type.Value.nBoolean(value.asBoolean());
+            return nBoolean(value.asBoolean());
         } else if (value.hasType(TYPE_SYSTEM.FLOAT())) {
-            return com.fredhonorio.neu.type.Value.nFloat(value.asDouble());
+            return nFloat(value.asDouble());
         } else if (value.hasType(TYPE_SYSTEM.STRING())) {
-            return com.fredhonorio.neu.type.Value.nString(value.asString());
+            return nString(value.asString());
         } else if (value.hasType(TYPE_SYSTEM.NULL())) {
             return NNull.instance;
         } else if (value.hasType(TYPE_SYSTEM.MAP())) {

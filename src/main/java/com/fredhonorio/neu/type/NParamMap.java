@@ -1,5 +1,7 @@
 package com.fredhonorio.neu.type;
 
+import javaslang.Tuple2;
+import javaslang.collection.Map;
 import javaslang.collection.TreeMap;
 
 import java.util.function.Function;
@@ -37,6 +39,10 @@ public class NParamMap implements Parameter {
         NParamMap nParamMap = (NParamMap) o;
 
         return value != null ? value.equals(nParamMap.value) : nParamMap.value == null;
+    }
+
+    public static NParamMap of(Iterable<Tuple2<String, Parameter>> map) {
+        return new NParamMap(TreeMap.ofEntries(map));
     }
 
     @Override

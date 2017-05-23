@@ -26,6 +26,10 @@ public class Properties {
         return new Properties(TreeMap.of(k, v));
     }
 
+    public boolean isEmpty() {
+        return properties.isEmpty();
+    }
+
     public String describe() {
         return properties
             .toList()
@@ -42,5 +46,20 @@ public class Properties {
     @Override
     public String toString() {
         return "Properties(" + describe() + ')';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Properties that = (Properties) o;
+
+        return properties != null ? properties.equals(that.properties) : that.properties == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return properties != null ? properties.hashCode() : 0;
     }
 }
