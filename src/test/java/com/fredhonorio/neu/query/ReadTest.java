@@ -12,7 +12,7 @@ import static com.fredhonorio.neu.type.Node.node;
 
 public class ReadTest {
 
-    static final Neo4jTestServer server = Neo4jTestServer.build();
+    static final Neo4jInProcess server = Neo4jInProcess.build();
 
     @Test
     public void y() {
@@ -40,15 +40,15 @@ public class ReadTest {
 
         Driver driver = server.driver();
 
-        Statement node = Statement.createNode(
-            node(Label.of("HELLO"), Properties.of("id", Value.nString("1"))));
-
-        Write.writeSession(driver, node);
-        Write.writeSession(driver, node);
-        Write.writeSession(driver, node);
-
-        Read.list(driver, Statement.of("MATCH (n) RETURN n"))
-            .forEach(System.out::println);
+//        Statement node = Statement.createNode(
+//            node(Label.of("HELLO"), Properties.of("id", Value.nString("1"))));
+//
+//        Write.writeSession(driver, node);
+//        Write.writeSession(driver, node);
+//        Write.writeSession(driver, node);
+//
+//        Read.list(driver, Statement.of("MATCH (n) RETURN n"))
+//            .forEach(System.out::println);
     }
 
 }
