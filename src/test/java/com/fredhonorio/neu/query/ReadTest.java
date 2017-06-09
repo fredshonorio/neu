@@ -1,23 +1,36 @@
 package com.fredhonorio.neu.query;
 
-import com.fredhonorio.neu.type.Value;
+import com.fredhonorio.neu.decoder.ResultDecoder;
+import com.fredhonorio.neu.query.param.Builder;
+import com.fredhonorio.neu.type.*;
 import javaslang.collection.List;
-import com.fredhonorio.neu.type.Label;
-import com.fredhonorio.neu.type.NParamList;
-import com.fredhonorio.neu.type.Properties;
+import javaslang.collection.Seq;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.driver.v1.Driver;
+import org.neo4j.driver.v1.GraphDatabase;
 
+import static com.fredhonorio.neu.decoder.ResultDecoder.field;
+import static com.fredhonorio.neu.decoder.ResultDecoder.nodeProps;
 import static com.fredhonorio.neu.type.Node.node;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ReadTest {
 
-    static final Neo4jInProcess server = Neo4jInProcess.build();
+//    static final Driver driver = Neo4jInProcess.build().driver();
+
+    static final Driver driver = GraphDatabase.driver("bolt://localhost");
+
+    @Before
+    public void init() {
+        Write.writeSession(driver, Builder.of("MATCH (n) DETACH DELETE n").build()).get();
+    }
 
     @Test
     public void y() {
-        Driver driver = server.driver();
-
         Statement s = new Statement(
             "CREATE (n:X {name: $x[0][0], flag: $x[1].zoop})",
             Value.paramMap(
@@ -36,19 +49,25 @@ public class ReadTest {
 
     }
     @Test
-    public void x() {
+    public void nodeProperties() {
 
-        Driver driver = server.driver();
+        Label X = Label.of("X");
 
-//        Statement node = Statement.createNode(
-//            node(Label.of("HELLO"), Properties.of("id", Value.nString("1"))));
-//
-//        Write.writeSession(driver, node);
-//        Write.writeSession(driver, node);
-//        Write.writeSession(driver, node);
-//
-//        Read.list(driver, Statement.of("MATCH (n) RETURN n"))
-//            .forEach(System.out::println);
+        Statement create = Builder
+            .of("CREATE ")
+            .node(X, Properties.of("id", "1")).s(", ")
+            .node(X, Properties.of("id", "2"))
+            .build();
+
+        Write.writeSessionX(driver, create).get();
+
+        Seq<String> ids = Read.list(
+            driver,
+            Builder.of("MATCH ").node("s", X).s(" RETURN s")
+                .build(),
+            field("s", nodeProps(field("id", ResultDecoder.String)))).get();
+
+        assertTrue(ids.eq(List.of("1", "2")));
     }
 
 }

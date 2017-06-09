@@ -71,6 +71,14 @@ public interface ResultDecoder<T> {
             );
     }
 
+    public static <T> ResultDecoder<T> nodeProps(ResultDecoder<T> inner) {
+        return Node.andThen(n -> ign -> inner.decode(n.node.properties.asResult()));
+    }
+
+    public static <T> ResultDecoder<T> relProps(ResultDecoder<T> inner) {
+        return Relationship.andThen(n -> ign -> inner.decode(n.relationship.properties.asResult()));
+    }
+
     @SafeVarargs
     public static <T> ResultDecoder<T> oneOf(ResultDecoder<T>... decoders) {
         return oneOf(javaslang.collection.List.of(decoders));

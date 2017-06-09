@@ -72,6 +72,14 @@ public interface Next {
         default Builder.NodeB node(String name, Iterable<Label> labels, Properties properties) {
             return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
         }
+
+        default Builder.NodeB node(String name, com.fredhonorio.neu.type.Node node) {
+            return node(fNode(Option.of(name), node.labels, node.properties));
+        }
+
+        default Builder.NodeB node(com.fredhonorio.neu.type.Node node) {
+            return node(fNode(Option.none(), node.labels, node.properties));
+        }
     }
 
     interface From extends Fragments {

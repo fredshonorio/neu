@@ -21,4 +21,14 @@ public interface Primitive extends Value {
             nil -> nil
         );
     }
+
+    default Result asResult() {
+        return matchPrim(
+            bool -> bool,
+            floating -> floating,
+            integer -> integer,
+            str -> str,
+            nil -> nil
+        );
+    }
 }

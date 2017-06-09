@@ -1,16 +1,21 @@
 package com.fredhonorio.neu.type;
 
-import org.neo4j.driver.v1.types.Relationship;
-
 import java.util.function.Function;
 
 public class NRelationship implements Result {
 
-    public final Relationship value;
+    public final long id;
+    public final long startId;
+    public final long endId;
+    public final Relationship relationship;
 
-    public NRelationship(Relationship value) {
-        this.value = value;
+    public NRelationship(long id, long startId, long endId, Relationship relationship) {
+        this.id = id;
+        this.startId = startId;
+        this.endId = endId;
+        this.relationship = relationship;
     }
+
 
     @Override
     public <T> T matchResult(Function<NBoolean, T> bool, Function<NFloat, T> flt, Function<NInteger, T> integer, Function<NResultList, T> list, Function<NResultMap, T> map, Function<NString, T> string, Function<NNull, T> nil, Function<NNode, T> node, Function<NPath, T> path, Function<NRelationship, T> relationship) {
@@ -20,7 +25,10 @@ public class NRelationship implements Result {
     @Override
     public String toString() {
         return "NRelationship{" +
-            "value=" + value +
+            "id=" + id +
+            ", startId=" + startId +
+            ", endId=" + endId +
+            ", relationship=" + relationship +
             '}';
     }
 
@@ -31,11 +39,18 @@ public class NRelationship implements Result {
 
         NRelationship that = (NRelationship) o;
 
-        return value != null ? value.equals(that.value) : that.value == null;
+        if (id != that.id) return false;
+        if (startId != that.startId) return false;
+        if (endId != that.endId) return false;
+        return relationship != null ? relationship.equals(that.relationship) : that.relationship == null;
     }
 
     @Override
     public int hashCode() {
-        return value != null ? value.hashCode() : 0;
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (int) (startId ^ (startId >>> 32));
+        result = 31 * result + (int) (endId ^ (endId >>> 32));
+        result = 31 * result + (relationship != null ? relationship.hashCode() : 0);
+        return result;
     }
 }

@@ -8,6 +8,7 @@ import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.Session;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.v1.summary.ResultSummary;
 
 public class Write {
 
@@ -18,6 +19,12 @@ public class Write {
         return result;
     }
 
+    public static Try<ResultSummary> writeSessionX(Driver driver, Statement statement) {
+        Try<Session> session = Try.of(driver::session);
+        Try<ResultSummary> result = session.mapTry(s -> s.run(toNative(statement))).mapTry(e -> e.consume());
+        session.andThen(Session::close);
+        return result;
+    }
 
     private static org.neo4j.driver.v1.Statement toNative(Statement statement) {
         String q = statement.queryTemplate;

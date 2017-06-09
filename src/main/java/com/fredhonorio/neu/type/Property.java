@@ -23,4 +23,15 @@ public interface Property extends Value {
             nil -> nil
         );
     }
+
+    public static Result asResult(Property prop) {
+        return prop.matchProp(
+            bool -> bool,
+            floating -> floating,
+            integer -> integer,
+            list -> new NResultList(list.value.map(Primitive::asResult)),
+            string -> string,
+            nil -> nil
+        );
+    }
 }

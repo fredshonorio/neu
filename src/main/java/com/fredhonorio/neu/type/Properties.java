@@ -18,16 +18,52 @@ public class Properties {
         return new Properties(properties.put(k, v));
     }
 
-    public static Properties empty() {
-        return new Properties(TreeMap.empty());
+    public Properties put(String k, boolean v) {
+        return new Properties(properties.put(k, Value.nBoolean(v)));
+    }
+
+    public Properties put(String k, String v) {
+        return new Properties(properties.put(k, Value.nString(v)));
+    }
+
+    public Properties put(String k, double v) {
+        return new Properties(properties.put(k, Value.nFloat(v)));
+    }
+
+    public Properties put(String k, long v) {
+        return new Properties(properties.put(k, Value.nInteger(v)));
     }
 
     public static Properties of(String k, Property v) {
         return new Properties(TreeMap.of(k, v));
     }
 
+    public static Properties of(String k, boolean v) {
+        return new Properties(TreeMap.of(k, Value.nBoolean(v)));
+    }
+
+    public static Properties of(String k, String v) {
+        return new Properties(TreeMap.of(k, Value.nString(v)));
+    }
+
+    public static Properties of(String k, double v) {
+        return new Properties(TreeMap.of(k, Value.nFloat(v)));
+    }
+
+    public static Properties of(String k, long v) {
+        return new Properties(TreeMap.of(k, Value.nInteger(v)));
+    }
+
+    public static Properties empty() {
+        return new Properties(TreeMap.empty());
+    }
+
     public boolean isEmpty() {
         return properties.isEmpty();
+    }
+
+    public Result asResult() {
+        return new NResultMap(properties.mapValues(Property::asResult));
     }
 
     public String describe() {

@@ -16,7 +16,7 @@ import static org.neo4j.driver.internal.types.InternalTypeSystem.TYPE_SYSTEM;
 
 public class Read {
 
-    public static <T> Try<Seq<Record>> list(Driver driver, Statement statement) {
+    public static Try<Seq<Record>> list(Driver driver, Statement statement) {
         return Write.writeSession(driver, statement)
             .map(r -> Stream.ofAll(r.list()))
             .map(records -> records.map(Read::parseRecord))
@@ -32,7 +32,7 @@ public class Read {
             .flatMap(Try::sequence);
     }
 
-    public static Try<Record> parseRecord(org.neo4j.driver.v1.Record r) {
+    private static Try<Record> parseRecord(org.neo4j.driver.v1.Record r) {
         return Try.of(() -> decode(r));
     }
 
@@ -44,15 +44,32 @@ public class Read {
         return new Record(items);
     }
 
-    private static Node decodeNode(org.neo4j.driver.v1.types.Node node) throws IllegalStateException {
-        return new Node(
-            LinkedHashSet.ofAll(List.ofAll(node.labels()).map(Label::of)),
-            new Properties(
-                TreeMap.ofEntries(
-                    List.ofAll(node.keys())
-                        .toMap(k -> Tuple.of(k, propValue(node.get(k))))))
+    private static NNode decodeNode(org.neo4j.driver.v1.types.Node node) throws IllegalStateException {
+        return new NNode(
+            node.id(),
+            new Node(
+                LinkedHashSet.ofAll(List.ofAll(node.labels()).map(Label::of)),
+                new Properties(
+                    TreeMap.ofEntries(
+                        List.ofAll(node.keys())
+                            .toMap(k -> Tuple.of(k, propValue(node.get(k)))))))
         );
     }
+
+    private static NRelationship decodeRelationship(org.neo4j.driver.v1.types.Relationship relationship) throws IllegalStateException {
+        return new NRelationship(
+            relationship.id(),
+            relationship.startNodeId(),
+            relationship.endNodeId(),
+            new Relationship(
+                relationship.type(),
+                new Properties(
+                    TreeMap.ofEntries(
+                        List.ofAll(relationship.keys())
+                            .toMap(k -> Tuple.of(k, propValue(relationship.get(k)))))))
+        );
+    }
+
 
     private static Property propValue(Value value) {
         if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
@@ -90,13 +107,11 @@ public class Read {
 
     private static Result value(Value value) throws IllegalStateException {
         if (value.hasType(TYPE_SYSTEM.NODE())) {
-            org.neo4j.driver.v1.types.Node nativeNode = value.asNode();
-            long id = nativeNode.id();
-            return new NNode(id, decodeNode(nativeNode));
+            return decodeNode(value.asNode());
         } else if (value.hasType(TYPE_SYSTEM.PATH())) {
             return new NPath(value.asPath());
-        } else if (value.hasType(TYPE_SYSTEM.RELATIONSHIP())) { // test
-            return new NRelationship(value.asRelationship());
+        } else if (value.hasType(TYPE_SYSTEM.RELATIONSHIP())) {
+            return decodeRelationship(value.asRelationship());
         } else if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
             return nBoolean(value.asBoolean());
         } else if (value.hasType(TYPE_SYSTEM.FLOAT())) {
