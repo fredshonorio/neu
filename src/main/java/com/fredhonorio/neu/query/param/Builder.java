@@ -1,10 +1,7 @@
 package com.fredhonorio.neu.query.param;
 
 import com.fredhonorio.neu.query.Statement;
-import com.fredhonorio.neu.type.Value;
 import javaslang.collection.List;
-
-import java.util.function.Function;
 
 import static com.fredhonorio.neu.type.Value.paramList;
 
@@ -16,8 +13,8 @@ public class Builder implements Fragments {
         this.fragments = fragments;
     }
 
-    public static StrB of(String s) {
-        return new EmptyB().s(s);
+    public static EmptyB builder() {
+        return new EmptyB();
     }
 
     @Override
@@ -55,21 +52,10 @@ public class Builder implements Fragments {
         }
     }
 
-    public static class ParamB extends Builder implements Next.Str {
+    public static class ParamB extends Builder implements Next.Str, Next.Final {
 
         public ParamB(List<Fragment> fragments) {
             super(fragments);
         }
-    }
-
-    public static void main(String[] args) {
-
-        Statement s = Builder.of("MATCH")
-            .node("n").to("r").node("a").from("a").node("a")
-            .s("WHERE n.id IN ").param(paramList("1", "2", "3"))
-            .s(" RETURN n")
-            .build();
-
-        System.out.println(s);
     }
 }

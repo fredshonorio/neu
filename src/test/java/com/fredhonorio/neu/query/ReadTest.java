@@ -13,6 +13,7 @@ import org.neo4j.driver.v1.GraphDatabase;
 
 import static com.fredhonorio.neu.decoder.ResultDecoder.field;
 import static com.fredhonorio.neu.decoder.ResultDecoder.nodeProps;
+import static com.fredhonorio.neu.query.param.Builder.builder;
 import static com.fredhonorio.neu.type.Node.node;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -26,7 +27,7 @@ public class ReadTest {
 
     @Before
     public void init() {
-        Write.writeSession(driver, Builder.of("MATCH (n) DETACH DELETE n").build()).get();
+        Write.writeSession(driver, builder().match().node("n").s("DETACH DELETE n").build()).get();
     }
 
     @Test
@@ -48,13 +49,14 @@ public class ReadTest {
             .forEach(System.out::println);
 
     }
+
     @Test
     public void nodeProperties() {
 
         Label X = Label.of("X");
 
-        Statement create = Builder
-            .of("CREATE ")
+        Statement create = builder()
+            .create()
             .node(X, Properties.of("id", "1")).s(", ")
             .node(X, Properties.of("id", "2"))
             .build();
@@ -63,11 +65,13 @@ public class ReadTest {
 
         Seq<String> ids = Read.list(
             driver,
-            Builder.of("MATCH ").node("s", X).s(" RETURN s")
+            builder().match().node("s", X).s(" RETURN s")
                 .build(),
             field("s", nodeProps(field("id", ResultDecoder.String)))).get();
 
         assertTrue(ids.eq(List.of("1", "2")));
     }
+
+    // TODO: test every basic type (boolean, null, int etc
 
 }
