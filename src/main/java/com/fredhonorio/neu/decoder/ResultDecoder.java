@@ -1,9 +1,8 @@
 package com.fredhonorio.neu.decoder;
 
 import com.fredhonorio.neu.type.*;
-import javaslang.Function2;
-import javaslang.Function3;
-import javaslang.Tuple2;
+import com.fredhonorio.neu.type.Value;
+import javaslang.*;
 import javaslang.collection.List;
 import javaslang.collection.Map;
 import javaslang.collection.Seq;
@@ -24,6 +23,18 @@ public interface ResultDecoder<T> {
 
     default <X> ResultDecoder<X> map(Function<T, X> f) {
         return from -> decode(from).map(f);
+    }
+
+    default <X> ResultDecoder<X> mapTry(Try.CheckedFunction<T, X> f) {
+        return mapTry(f, (x, t) -> t.getMessage());
+    }
+
+    default <X> ResultDecoder<X> mapTry(Try.CheckedFunction<T, X> f, Function2<T, Throwable, String> msg) {
+        return from -> decode(from)
+            .flatMap(t ->
+                Try.of(() -> f.apply(t))
+                    .map(v -> Either.<String, X>right(v))
+                    .getOrElseGet(thr -> Either.<String, X>left(msg.apply(t, thr))));
     }
 
     default ResultDecoder<T> filter(Predicate<T> pred, Function<T, String> ifMissing) {
@@ -91,6 +102,14 @@ public interface ResultDecoder<T> {
             .mapLeft(err -> "field '" + key + "': " + err);
     }
 
+    public static <T> ResultDecoder<Option<T>> optionalField(String key, ResultDecoder<T> inner) {
+        return root -> Map.decode(root)
+            .flatMap(m -> m.value.get(key)
+                .map(e -> inner.decode(e).map(Option::some))
+                .getOrElse(Either.right(Option.none())))
+            .mapLeft(err -> "field '" + key + "': " + err);
+    }
+
     static <T> ResultDecoder<Option<T>> nullable(ResultDecoder<T> decoder) {
         return oneOf(
             decoder.map(Option::some),
@@ -132,7 +151,6 @@ public interface ResultDecoder<T> {
         return fields.foldRight(inner, ResultDecoder::field);
     }
 
-    // TODO: this is cool!
     static <I, T> ResultDecoder<T> enumeration(ResultDecoder<I> inner, Function<I, Option<T>> mapping) {
         return i -> inner.decode(i)
             .flatMap(decoded -> optionToEither(mapping.apply(decoded), "cannot find a matching value for " + decoded));
@@ -173,7 +191,7 @@ public interface ResultDecoder<T> {
 
     static <T> Either<String, List<T>> sequence(Seq<Either<String, T>> seq) {
 
-        Option<Either<java.lang.String, T>> failure = seq.find(Either::isRight);
+        Option<Either<java.lang.String, T>> failure = seq.find(Either::isLeft);
 
         if (failure.isDefined())
             return Either.left(failure.get().getLeft());
@@ -193,12 +211,32 @@ public interface ResultDecoder<T> {
         return ignore -> Either.left(res);
     }
 
-    static <A, B, TT> ResultDecoder<TT> map2(ResultDecoder<A> a, ResultDecoder<B> b, Function2<A, B, TT> f) {
-        return a.andThen(_a -> b.map(_b -> f.apply(_a, _b)));
+    static <A, B, TT> ResultDecoder<TT> map2(ResultDecoder<A> a, ResultDecoder<B> b, Function2<A, B, TT> mapper) {
+        return a.andThen(_a -> b.map(_b -> mapper.apply(_a, _b)));
     }
 
-    static <A, B, C, TT> ResultDecoder<TT> map3(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, Function3<A, B, C, TT> f) {
-        return a.andThen(_a -> b.andThen(_b -> c.map(_c -> f.apply(_a, _b, _c))));
+    static <A, B, C, TT> ResultDecoder<TT> map3(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, Function3<A, B, C, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.map(_c -> mapper.apply(_a, _b, _c))));
+    }
+
+    static <A, B, C, D, TT> ResultDecoder<TT> map4(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, Function4<A, B, C, D, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.map(_d -> mapper.apply(_a, _b, _c, _d)))));
+    }
+
+    static <A, B, C, D, E, TT> ResultDecoder<TT> map5(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, Function5<A, B, C, D, E, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.andThen(_d -> e.map(_e -> mapper.apply(_a, _b, _c, _d, _e))))));
+    }
+
+    static <A, B, C, D, E, F, TT> ResultDecoder<TT> map6(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, Function6<A, B, C, D, E, F, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.andThen(_d -> e.andThen(_e -> f.map(_f -> mapper.apply(_a, _b, _c, _d, _e, _f)))))));
+    }
+
+    static <A, B, C, D, E, F, G, TT> ResultDecoder<TT> map7(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, ResultDecoder<G> g, Function7<A, B, C, D, E, F, G, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.andThen(_d -> e.andThen(_e -> f.andThen(_f -> g.map(_g -> mapper.apply(_a, _b, _c, _d, _e, _f, _g))))))));
+    }
+
+    static <A, B, C, D, E, F, G, H, TT> ResultDecoder<TT> map8(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, ResultDecoder<G> g, ResultDecoder<H> h, Function8<A, B, C, D, E, F, G, H, TT> mapper) {
+        return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.andThen(_d -> e.andThen(_e -> f.andThen(_f -> g.andThen(_g -> h.map(_h -> mapper.apply(_a, _b, _c, _d, _e, _f, _g, _h)))))))));
     }
 
     // private
