@@ -6,6 +6,7 @@ import javaslang.Tuple;
 import javaslang.collection.*;
 import javaslang.control.Try;
 import org.neo4j.driver.v1.Driver;
+import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.Value;
 import org.neo4j.driver.v1.Values;
 
@@ -25,6 +26,11 @@ public class Read {
 
     public static <T> Try<Seq<T>> list(Driver driver, Statement statement, ResultDecoder<T> decoder) {
         return Write.writeSession(driver, statement)
+            .flatMap(r -> list(r, decoder));
+    }
+
+    public static <T> Try<Seq<T>> list(StatementResult result, ResultDecoder<T> decoder) {
+        return Try.success(result)
             .map(r -> Stream.ofAll(r.list()))
             .map(records -> records
                 .map(Read::parseRecord)
@@ -69,7 +75,6 @@ public class Read {
                             .toMap(k -> Tuple.of(k, propValue(relationship.get(k)))))))
         );
     }
-
 
     private static Property propValue(Value value) {
         if (value.hasType(TYPE_SYSTEM.BOOLEAN())) {
@@ -116,6 +121,8 @@ public class Read {
             return nBoolean(value.asBoolean());
         } else if (value.hasType(TYPE_SYSTEM.FLOAT())) {
             return nFloat(value.asDouble());
+        } else if (value.hasType(TYPE_SYSTEM.INTEGER())) {
+            return nInteger(value.asLong());
         } else if (value.hasType(TYPE_SYSTEM.STRING())) {
             return nString(value.asString());
         } else if (value.hasType(TYPE_SYSTEM.NULL())) {
@@ -125,7 +132,7 @@ public class Read {
         } else if (value.hasType(TYPE_SYSTEM.LIST())) {
             return list(value.asList());
         } else {
-            throw new IllegalStateException("Cannot handle type: " + value.type());
+            throw new IllegalStateException("Cannot handle type: " + value.type().name());
         }
     }
 
@@ -150,16 +157,4 @@ public class Read {
             .map(t -> t.map2(Read::value)) // can throw
             .foldLeft(NResultMap.empty, (z, x) -> z.put(x._1, x._2));
     }
-
-//    public static void main(String[] args) {
-//        Driver d = GraphDatabase.driver("bolt://localhost", Config.build().withEncryptionLevel(Config.EncryptionLevel.NONE).toConfig());
-//        NeoWriterOp w = new NeoWriterOp(d) {
-//        };
-//
-//        List<NResultMap> r = w.run(Statement.statement("MATCH (n) RETURN n"))
-//            .map(Read::list).get();
-//
-//        r.forEach(System.out::println);
-//
-//    }
 }
