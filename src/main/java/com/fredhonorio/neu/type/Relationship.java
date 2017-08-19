@@ -2,7 +2,7 @@ package com.fredhonorio.neu.type;
 
 public class Relationship {
 
-    public final String type; // maybe it should be a type?
+    public final String type; // TODO: this should be Type type;
     public final Properties properties;
 
     public Relationship(String type, Properties properties) {

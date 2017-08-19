@@ -35,7 +35,11 @@ public class Label implements Comparable<Label> {
         return new Label(sanitize(value));
     }
 
-    public static List<Label> many(String...values) {
+    public static Label label(String value) {
+        return of(value);
+    }
+
+    public static List<Label> many(String... values) {
         return List.of(values).map(Label::of);
     }
 
