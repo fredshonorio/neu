@@ -25,43 +25,98 @@ public interface Next {
             return new Builder.StrB(fragments().append(new Fragment.Str(s)));
         }
 
+        @Deprecated
         default Builder.StrB match() {
             return s("MATCH");
         }
 
+        @Deprecated
         default Builder.StrB with() {
             return s("WITH");
         }
 
+        @Deprecated
         default Builder.StrB with(String... parts) {
             return with().s(List.of(parts).mkString(", "));
         }
 
+        @Deprecated
         default Builder.StrB create() {
             return s("CREATE");
         }
 
+        @Deprecated
         default Builder.StrB create(String s) {
             return create().s(s);
         }
 
+        @Deprecated
         default Builder.StrB merge() {
             return s("MERGE");
         }
 
+        @Deprecated
         default Builder.StrB delete() {
             return s("DELETE");
         }
 
+        @Deprecated
         default Builder.StrB merge(String s) {
             return merge().s(s);
         }
 
+        @Deprecated
         default Builder.StrB return_(String s) {
             return s("RETURN").s(s);
         }
 
+        @Deprecated
         default Builder.StrB return_(String...parts) {
+            return s("RETURN").s(List.of(parts).mkString(", "));
+        }
+
+        //
+        default Builder.StrB Match() {
+            return s("MATCH");
+        }
+
+        default Builder.StrB With() {
+            return s("WITH");
+        }
+
+        default Builder.StrB With(String... parts) {
+            return With().s(List.of(parts).mkString(", "));
+        }
+
+        default <T extends AsString> Builder.StrB With(T... parts) {
+            return With().s(List.of(parts).map(AsString::asString).mkString(", "));
+        }
+
+        default Builder.StrB Create() {
+            return s("CREATE");
+        }
+
+        default Builder.StrB Merge() {
+            return s("MERGE");
+        }
+
+        default Builder.StrB Merge(String s) {
+            return Merge().s(s);
+        }
+
+        default Builder.StrB Where() {
+            return s("WHERE");
+        }
+
+        default Builder.StrB Delete() {
+            return s("DELETE");
+        }
+
+        default Builder.StrB Return(String s) {
+            return s("RETURN").s(s);
+        }
+
+        default Builder.StrB Return(String...parts) {
             return s("RETURN").s(List.of(parts).mkString(", "));
         }
     }
