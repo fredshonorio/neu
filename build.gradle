@@ -1,11 +1,17 @@
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'idea'
+
+plugins {
+        id "java"
+        id "maven"
+        id "maven-publish"
+        id "idea"
+        id "com.jfrog.bintray" version "1.7.3"
+}
 
 sourceCompatibility = targetCompatibility = 1.8
-
-version = '0.0.0-rc4'
+version = '0.1.0'
 project.group = "net.meshapp"
+
+apply from: 'release.gradle'
 
 jar {
     manifest { attributes 'Implementation-Title': 'neu', 'Implementation-Version': version }
@@ -26,20 +32,6 @@ dependencies {
             'org.neo4j:neo4j:3.1.0',
             'io.javaslang:javaslang-test:2.0.6'
 }
-
-publishing {
-    repositories {
-        maven {
-            url 's3://maven.meshapp.net.s3-eu-west-1.amazonaws.com'
-            credentials(AwsCredentials) {
-                accessKey aws_s3_publish_access_key
-                secretKey aws_s3_publish_secret_key
-    }}}
-
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-    }}}
 
 test { exclude "**" }
 
