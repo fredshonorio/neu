@@ -1,22 +1,27 @@
 package com.fredhonorio.neu.query;
 
+import com.fredhonorio.neu.type.NParamMap;
 import com.fredhonorio.neu.type.Parameter;
 import javaslang.control.Try;
-import com.fredhonorio.neu.type.NParamMap;
 import org.neo4j.driver.internal.value.*;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.Value;
+import org.neo4j.driver.v1.*;
 import org.neo4j.driver.v1.summary.ResultSummary;
 
 public class Write {
 
     public static Try<StatementResult> writeSession(Driver driver, Statement statement) {
+        return writeSession(driver, statement, res -> res);
+    }
+
+    public static <T> Try<T> writeSession(Driver driver, Statement statement, Try.CheckedFunction<StatementResult, T> extract) {
         Try<Session> session = Try.of(driver::session);
-        Try<StatementResult> result = session.mapTry(s -> s.run(toNative(statement)));
-        session.andThen(Session::close);
-        return result;
+        Try<T> result = session.mapTry(s -> s.writeTransaction(tx -> run(tx, statement, extract).get()));
+        Try<Session> closed = session.andThen(Session::close);
+        return closed.flatMap(ignore -> result); // success only if the session is closed and there is a result
+    }
+
+    public static <T> Try<T> run(Transaction tx, Statement statement, Try.CheckedFunction<StatementResult, T> extract) {
+        return Try.of(() -> tx.run(toNative(statement))).mapTry(extract);
     }
 
     public static Try<ResultSummary> writeSessionX(Driver driver, Statement statement) {
