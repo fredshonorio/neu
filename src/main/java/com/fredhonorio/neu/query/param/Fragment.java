@@ -1,6 +1,8 @@
 package com.fredhonorio.neu.query.param;
 
+import com.fredhonorio.neu.query.Ref;
 import com.fredhonorio.neu.type.*;
+import com.fredhonorio.neu.util.Strings;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
@@ -8,6 +10,9 @@ import javaslang.collection.Map;
 import javaslang.control.Option;
 
 import java.util.function.Function;
+
+import static com.fredhonorio.neu.util.Strings.concat;
+import static java.lang.String.join;
 
 public interface Fragment {
 
@@ -116,10 +121,10 @@ public interface Fragment {
     // TODO: relations have properties as well
     public static final class Rel implements Fragment {
         public final Dir direction;
-        public final Option<String> name;
-        public final Option<String> type;
+        public final Option<Ref> name;
+        public final Option<Type> type;
 
-        public Rel(Dir direction, Option<String> name, Option<String> type) {
+        public Rel(Dir direction, Option<Ref> name, Option<Type> type) {
             this.direction = direction;
             this.name = name;
             this.type = type;
@@ -135,11 +140,11 @@ public interface Fragment {
             String left = direction == Dir.FROM ? "<-" : "-";
             String right = direction == Dir.TO ? "->" : "-";
 
-            String middle = name.getOrElse("") + type.map(t -> ":" + t).getOrElse("");
+            String middle = concat(name.map(Ref::asString).getOrElse(""), type.map(t -> concat(":", t.type)).getOrElse(""));
 
             return name.isDefined() || type.isDefined()
-                ? left + "[" + middle + "]" + right
-                : left + right;
+                ? concat(left, "[", middle, "]", right)
+                : concat(left, right);
         }
     }
 }

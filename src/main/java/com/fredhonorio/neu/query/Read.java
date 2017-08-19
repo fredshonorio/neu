@@ -68,7 +68,7 @@ public class Read {
             relationship.startNodeId(),
             relationship.endNodeId(),
             new Relationship(
-                relationship.type(),
+                Type.of(relationship.type()),
                 new Properties(
                     TreeMap.ofEntries(
                         List.ofAll(relationship.keys())

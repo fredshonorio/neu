@@ -1,5 +1,7 @@
 package com.fredhonorio.neu.query.param;
 
+import com.fredhonorio.neu.query.AsString;
+import com.fredhonorio.neu.query.Ref;
 import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.type.*;
 import javaslang.*;
@@ -101,24 +103,49 @@ public interface Next {
             return node(fNode(Option.of(name), empty(), properties));
         }
 
+        @Deprecated
         default Builder.NodeB node(String name, Label label) {
             return node(fNode(Option.of(name), LinkedHashSet.of(label), Properties.empty()));
         }
 
+        default Builder.NodeB node(Ref name, Label label) {
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), Properties.empty()));
+        }
+
+        @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels) {
             return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), Properties.empty()));
         }
 
+        default Builder.NodeB node(Ref name, Iterable<Label> labels) {
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), Properties.empty()));
+        }
+
+        @Deprecated
         default Builder.NodeB node(String name, Label label, Properties properties) {
             return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
         }
 
+        default Builder.NodeB node(Ref name, Label label, Properties properties) {
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), properties));
+        }
+
+        @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels, Properties properties) {
             return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
         }
 
+        default Builder.NodeB node(Ref name, Iterable<Label> labels, Properties properties) {
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), properties));
+        }
+
+        @Deprecated
         default Builder.NodeB node(String name, com.fredhonorio.neu.type.Node node) {
             return node(fNode(Option.of(name), node.labels, node.properties));
+        }
+
+        default Builder.NodeB node(Ref name, com.fredhonorio.neu.type.Node node) {
+            return node(fNode(Option.of(name.asString()), node.labels, node.properties));
         }
 
         default Builder.NodeB node(com.fredhonorio.neu.type.Node node) {
@@ -127,18 +154,33 @@ public interface Next {
     }
 
     interface From extends Fragments {
+        default Builder.FromB from(Ref name) {
+            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, Option.some(name), none())));
+        }
+
+        @Deprecated
         default Builder.FromB from(String s) {
-            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, Option.some(s), none())));
+            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, Option.some(Ref.of(s)), none())));
         }
     }
 
     interface To extends Fragments {
+        @Deprecated
         default Builder.ToB to(String s) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(s))));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(Type.of(s)))));
         }
 
+        default Builder.ToB to(Type type) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(type))));
+        }
+
+        @Deprecated
         default Builder.ToB to(String n, String s) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(n), Option.some(s))));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(Ref.of(n)), Option.some(Type.of(s)))));
+        }
+
+        default Builder.ToB to(Ref name, Type type) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), Option.some(type))));
         }
     }
 

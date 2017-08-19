@@ -2,10 +2,10 @@ package com.fredhonorio.neu.type;
 
 public class Relationship {
 
-    public final String type; // TODO: this should be Type type;
+    public final Type type;
     public final Properties properties;
 
-    public Relationship(String type, Properties properties) {
+    public Relationship(Type type, Properties properties) {
         this.type = type;
         this.properties = properties;
     }
