@@ -1,11 +1,12 @@
 package com.fredhonorio.neu.query;
 
-public class Ref implements AsString {
+import com.fredhonorio.neu.util.Strings;
+import static com.fredhonorio.neu.util.Strings.concat;
 
-    public final String name;
+public class Ref extends Boxed<String> implements AsString, AsAble {
 
-    public Ref(String name) {
-        this.name = name;
+    private Ref(String value) {
+        super(value);
     }
 
     public static Ref of(String name) {
@@ -13,33 +14,16 @@ public class Ref implements AsString {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Ref ref = (Ref) o;
-
-        return name != null ? name.equals(ref.name) : ref.name == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Ref{" +
-            "name='" + name + '\'' +
-            '}';
-    }
-
-    @Override
     public String asString() {
-        return name;
+        return value;
     }
 
     public RefProp dot(Field f) {
         return new RefProp(this, f.name());
+    }
+
+    @Override
+    public RefExp as(Ref ref) {
+        return AsAble.as(this, ref);
     }
 }

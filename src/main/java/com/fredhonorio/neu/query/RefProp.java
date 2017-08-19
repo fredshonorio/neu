@@ -2,7 +2,7 @@ package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.util.Strings;
 
-public class RefProp implements AsString {
+public class RefProp implements AsString, AsAble {
     public final Ref ref;
     public final String prop;
 
@@ -42,5 +42,10 @@ public class RefProp implements AsString {
     @Override
     public String asString() {
         return Strings.concat(ref.asString(), ".", prop);
+    }
+
+    @Override
+    public RefExp as(Ref ref) {
+        return AsAble.as(this, ref);
     }
 }
