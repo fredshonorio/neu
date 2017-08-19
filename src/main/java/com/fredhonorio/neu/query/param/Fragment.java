@@ -1,10 +1,10 @@
 package com.fredhonorio.neu.query.param;
 
-import com.fredhonorio.neu.type.Label;
-import com.fredhonorio.neu.type.Node;
-import com.fredhonorio.neu.type.Parameter;
-import com.fredhonorio.neu.type.Properties;
+import com.fredhonorio.neu.type.*;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
+import javaslang.collection.Map;
 import javaslang.control.Option;
 
 import java.util.function.Function;
@@ -45,6 +45,7 @@ public interface Fragment {
             return node.apply(this);
         }
 
+        @Deprecated
         public String pattern(String var) {
             // sanitize var string
 
@@ -63,6 +64,29 @@ public interface Fragment {
 
 
             return "(" + nm + lbls + prps + ")";
+        }
+
+        public String pattern(Function<String, String> propToVarMapping) {
+            // sanitize var string
+
+            String nameStr = name.getOrElse("");
+
+            String labelsStr = node.labels.isEmpty()
+                ? ""
+                : node.labels.toList().map(x -> x.value).mkString(":", ":", "");
+
+            Properties properties = node.properties;
+            String propsStr = properties.isEmpty()
+                ? ""
+                : propertyPattern(properties, propToVarMapping);
+
+            String space = labelsStr.isEmpty() && nameStr.isEmpty() ? "" : " ";
+
+            return "(" + nameStr + labelsStr + space + propsStr + ")";
+        }
+
+        public static String propertyPattern(Properties props, Function<String, String> propToVarMapping) {
+            return props.asMap().toList().map(Tuple2::_1).map(prop -> "`" + prop + "`: $" + propToVarMapping.apply(prop)).mkString("{", ",", "}");
         }
 
         public static Node fNode(Option<String> name, LinkedHashSet<Label> labels, Properties properties) {

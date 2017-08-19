@@ -2,21 +2,65 @@ package com.fredhonorio.neu.query.param;
 
 import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.type.*;
+import javaslang.*;
 import javaslang.collection.LinkedHashSet;
 import javaslang.collection.List;
+import javaslang.collection.Tree;
+import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
-import java.util.TreeMap;
+import java.util.function.Function;
 
 import static com.fredhonorio.neu.query.param.Fragment.Node.fNode;
 import static javaslang.collection.LinkedHashSet.empty;
 import static javaslang.control.Option.none;
+import static javaslang.control.Option.some;
 
 public interface Next {
 
     interface Str extends Fragments {
         default Builder.StrB s(String s) {
             return new Builder.StrB(fragments().append(new Fragment.Str(s)));
+        }
+
+        default Builder.StrB match() {
+            return s("MATCH");
+        }
+
+        default Builder.StrB with() {
+            return s("WITH");
+        }
+
+        default Builder.StrB with(String... parts) {
+            return with().s(List.of(parts).mkString(", "));
+        }
+
+        default Builder.StrB create() {
+            return s("CREATE");
+        }
+
+        default Builder.StrB create(String s) {
+            return create().s(s);
+        }
+
+        default Builder.StrB merge() {
+            return s("MERGE");
+        }
+
+        default Builder.StrB delete() {
+            return s("DELETE");
+        }
+
+        default Builder.StrB merge(String s) {
+            return merge().s(s);
+        }
+
+        default Builder.StrB return_(String s) {
+            return s("RETURN").s(s);
+        }
+
+        default Builder.StrB return_(String...parts) {
+            return s("RETURN").s(List.of(parts).mkString(", "));
         }
     }
 
@@ -90,7 +134,11 @@ public interface Next {
 
     interface To extends Fragments {
         default Builder.ToB to(String s) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, Option.some(s), none())));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(s))));
+        }
+
+        default Builder.ToB to(String n, String s) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(n), Option.some(s))));
         }
     }
 
@@ -105,53 +153,48 @@ public interface Next {
 
             List<Fragment> fragments = fragments();
 
-            int indexed = 0;
-            String query = "";
-            TreeMap<String, Parameter> params = new TreeMap<>();
-            for (Fragment fragment : fragments) {
-
-                Option<Parameter> p = fragment.match(
-                    s -> Option.<Parameter>none(),
-                    node -> Option.<Parameter>when(
-                        !node.node.properties.isEmpty(),
-                        () -> new NParamMap(node.node.properties.asMap().mapValues(Property::asParam))
-                    ), // convert
-                    rel -> Option.<Parameter>none(),
-                    param -> Option.some(param.parameter)
-                );
-
-                int i = indexed;
-                String q = fragment.match(
-                    str -> str.s,
-                    node -> node.pattern("_" + i),
-                    rel -> rel.pattern(),
-                    param -> "$_" + i
-                );
-
-                query += q;
-
-                p.forEach(param -> params.put("_" + i, param));
-
-                indexed += fragment.match(
+            List<Integer> indices = fragments
+                .scanLeft(0, (z, f) -> z + f.match(
                     str -> 0,
                     node -> 1,
                     rel -> 0,
                     param -> 1
-                );
+                ));
 
-            }
+            List<Tuple2<String, TreeMap<String, Parameter>>> parts = fragments.zip(indices)
+                .map(x -> fragment(x._1, x._2));
 
-            // System.out.println(query);
-            // params.forEach((k, v) -> System.out.println(k + "=" + v));
+            String query = parts.map(Tuple2::_1).mkString(" ");
+            TreeMap<String, Parameter> params = parts.map(Tuple2::_2).flatMap(javaslang.Value::toList).transform(TreeMap::ofEntries);
 
-            return new Statement(
-                query,
-                new NParamMap(javaslang.collection.TreeMap.ofAll(params))
-            );
+            return new Statement(query, new NParamMap(params));
         }
 
         default String show() {
             return null;
         }
     }
+
+    static Tuple2<String, TreeMap<String, Parameter>> fragment(Fragment f, int idx) {
+        TreeMap<String, Parameter> empty = TreeMap.empty();
+        return f.match(
+            str -> Tuple.of(str.s, empty),
+            node -> nodeFragment(node, idx),
+            rel -> Tuple.of(rel.pattern(), empty),
+            param -> Tuple.of("$_" + idx, TreeMap.of("_" + idx, param.parameter))
+        );
+    }
+
+    static Tuple2<String, TreeMap<String, Parameter>> nodeFragment(Fragment.Node f, int idx) {
+        Function<String, String> propName = prop -> "_" + idx + "_" + prop.replace('-', '_'); // TODO: fix escaping this as a reference
+
+        List<Tuple2<String, Parameter>> parameters = f.node.properties.asMap().toList()
+            .map(kv -> kv.map(propName, Property::asParam));
+
+        return Tuple.of(
+            f.pattern(propName),
+            TreeMap.ofEntries(parameters)
+        );
+    }
+
 }
