@@ -1,6 +1,7 @@
 package com.fredhonorio.neu.type;
 
 import javaslang.collection.TreeMap;
+import javaslang.control.Option;
 
 public class Properties {
     private final TreeMap<String, Property> properties;
@@ -32,6 +33,10 @@ public class Properties {
 
     public Properties put(String k, long v) {
         return new Properties(properties.put(k, Value.nInteger(v)));
+    }
+
+    public Properties putIfDefined(String k, Option<? extends Property> prop) {
+        return prop.map(p -> put(k, p)).getOrElse(this);
     }
 
     public static Properties of(String k, Property v) {
