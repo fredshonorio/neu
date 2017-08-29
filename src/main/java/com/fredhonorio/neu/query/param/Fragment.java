@@ -36,10 +36,10 @@ public interface Fragment {
     }
 
     public static class Node implements Fragment {
-        public final Option<String> name;
+        public final Option<Ref> name;
         public final com.fredhonorio.neu.type.Node node;
 
-        public Node(Option<String> name, com.fredhonorio.neu.type.Node node) {
+        public Node(Option<Ref> name, com.fredhonorio.neu.type.Node node) {
             this.name = name;
             this.node = node;
         }
@@ -50,10 +50,7 @@ public interface Fragment {
         }
 
         public String pattern(Function<Long, String> propToVarMapping) {
-
-            @Deprecated // .name should be a Ref
-            String middle = Fragment.showNodeOrRelationship(name.map(Ref::of), node.labels.toList().map(l -> l.value), node.properties, propToVarMapping);
-
+            String middle = Fragment.showNodeOrRelationship(name, node.labels.toList().map(l -> l.value), node.properties, propToVarMapping);
             return concat("(", middle, ")");
         }
 
@@ -66,7 +63,7 @@ public interface Fragment {
                 .mkString("{", ",", "}");
         }
 
-        public static Node fNode(Option<String> name, LinkedHashSet<Label> labels, Properties properties) {
+        public static Node fNode(Option<Ref> name, LinkedHashSet<Label> labels, Properties properties) {
             return new Node(
                 name,
                 new com.fredhonorio.neu.type.Node(

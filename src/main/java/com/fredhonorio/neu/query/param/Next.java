@@ -87,6 +87,7 @@ public interface Next {
             return s("WITH");
         }
 
+        @Deprecated
         default Builder.StrB With(String... parts) {
             return With().s(List.of(parts).mkString(", "));
         }
@@ -115,13 +116,24 @@ public interface Next {
             return s("DELETE");
         }
 
+        @Deprecated
         default Builder.StrB Return(String s) {
             return s("RETURN").s(s);
         }
 
+        @Deprecated
         default Builder.StrB Return(String... parts) {
             return s("RETURN").s(List.of(parts).mkString(", "));
         }
+
+        default Builder.StrB Limit(long limit) {
+            return s("LIMIT").s(Long.toString(limit));
+        }
+
+        default Builder.StrB Skip(long skip) {
+            return s("SKIP").s(Long.toString(skip));
+        }
+
     }
 
     interface Node extends Fragments {
@@ -133,8 +145,9 @@ public interface Next {
             return node(fNode(none(), LinkedHashSet.empty(), empty()));
         }
 
+        @Deprecated
         default Builder.NodeB node(String name) {
-            return node(fNode(Option.of(name), LinkedHashSet.empty(), empty()));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.empty(), empty()));
         }
 
         default Builder.NodeB node(Label label) {
@@ -157,53 +170,55 @@ public interface Next {
             return node(fNode(none(), LinkedHashSet.empty(), properties));
         }
 
+        @Deprecated
         default Builder.NodeB node(String name, Properties properties) {
-            return node(fNode(Option.of(name), LinkedHashSet.empty(), properties));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.empty(), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Label label) {
-            return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.of(label), empty()));
         }
 
+        @Deprecated
         default Builder.NodeB node(Ref name, Label label) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), empty()));
+            return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels) {
-            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.ofAll(labels), empty()));
         }
 
         default Builder.NodeB node(Ref name, Iterable<Label> labels) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), empty()));
+            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Label label, Properties properties) {
-            return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.of(label), properties));
         }
 
         default Builder.NodeB node(Ref name, Label label, Properties properties) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), properties));
+            return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels, Properties properties) {
-            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
+            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.ofAll(labels), properties));
         }
 
         default Builder.NodeB node(Ref name, Iterable<Label> labels, Properties properties) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), properties));
+            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, com.fredhonorio.neu.type.Node node) {
-            return node(fNode(Option.of(name), node.labels, node.properties));
+            return node(fNode(Option.of(Ref.of(name)), node.labels, node.properties));
         }
 
         default Builder.NodeB node(Ref name, com.fredhonorio.neu.type.Node node) {
-            return node(fNode(Option.of(name.asString()), node.labels, node.properties));
+            return node(fNode(Option.of(name), node.labels, node.properties));
         }
 
         default Builder.NodeB node(com.fredhonorio.neu.type.Node node) {
@@ -212,6 +227,7 @@ public interface Next {
     }
 
     interface From extends Fragments {
+        @Deprecated
         default Builder.FromB from(Ref name) {
             return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, some(name), none(), empty())));
         }
@@ -318,10 +334,7 @@ public interface Next {
             .map(t -> {
                     long index = t._2;
                     Property prop = t._1._2;
-                    return Tuple.of(
-                        propName.apply(index),
-                        Property.asParam(prop)
-                    );
+                    return Tuple.of(propName.apply(index), Property.asParam(prop));
                 }
             );
 
@@ -339,10 +352,7 @@ public interface Next {
             .map(t -> {
                     long index = t._2;
                     Property prop = t._1._2;
-                    return Tuple.of(
-                        propName.apply(index),
-                        Property.asParam(prop)
-                    );
+                    return Tuple.of(propName.apply(index), Property.asParam(prop));
                 }
             );
 
