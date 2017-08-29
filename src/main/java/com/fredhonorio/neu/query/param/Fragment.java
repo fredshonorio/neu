@@ -1,6 +1,6 @@
 package com.fredhonorio.neu.query.param;
 
-import com.fredhonorio.neu.query.Ref;
+import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.type.Label;
 import com.fredhonorio.neu.type.Parameter;
 import com.fredhonorio.neu.type.Properties;
@@ -36,10 +36,10 @@ public interface Fragment {
     }
 
     public static class Node implements Fragment {
-        public final Option<Ref> name;
+        public final Option<Var> name;
         public final com.fredhonorio.neu.type.Node node;
 
-        public Node(Option<Ref> name, com.fredhonorio.neu.type.Node node) {
+        public Node(Option<Var> name, com.fredhonorio.neu.type.Node node) {
             this.name = name;
             this.node = node;
         }
@@ -63,7 +63,7 @@ public interface Fragment {
                 .mkString("{", ",", "}");
         }
 
-        public static Node fNode(Option<Ref> name, LinkedHashSet<Label> labels, Properties properties) {
+        public static Node fNode(Option<Var> name, LinkedHashSet<Label> labels, Properties properties) {
             return new Node(
                 name,
                 new com.fredhonorio.neu.type.Node(
@@ -90,11 +90,11 @@ public interface Fragment {
     // TODO: relations have properties as well
     public static final class Rel implements Fragment {
         public final Dir direction;
-        public final Option<Ref> name;
+        public final Option<Var> name;
         public final Option<Type> type;
         public final Properties properties;
 
-        public Rel(Dir direction, Option<Ref> name, Option<Type> type, Properties properties) {
+        public Rel(Dir direction, Option<Var> name, Option<Type> type, Properties properties) {
             this.direction = direction;
             this.name = name;
             this.type = type;
@@ -120,7 +120,7 @@ public interface Fragment {
     }
 
     // private
-    static String showNodeOrRelationship(Option<Ref> ref, List<String> typeOrLabels, Properties properties, Function<Long, String> propToVarMapping) {
+    static String showNodeOrRelationship(Option<Var> ref, List<String> typeOrLabels, Properties properties, Function<Long, String> propToVarMapping) {
 
         String typeOrLabelsStr = typeOrLabels.nonEmpty()
                 ? concat(":", typeOrLabels.mkString(":"))

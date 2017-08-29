@@ -1,7 +1,7 @@
 package com.fredhonorio.neu.query.param;
 
-import com.fredhonorio.neu.query.AsString;
-import com.fredhonorio.neu.query.Ref;
+import com.fredhonorio.neu.query.Exp;
+import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.query.WithType;
 import com.fredhonorio.neu.type.*;
@@ -92,8 +92,8 @@ public interface Next {
             return With().s(List.of(parts).mkString(", "));
         }
 
-        default <T extends AsString> Builder.StrB With(T... parts) {
-            return With().s(List.of(parts).map(AsString::asString).mkString(", "));
+        default <T extends Exp> Builder.StrB With(T... parts) {
+            return With().s(List.of(parts).map(Exp::asString).mkString(", "));
         }
 
         default Builder.StrB Create() {
@@ -147,7 +147,7 @@ public interface Next {
 
         @Deprecated
         default Builder.NodeB node(String name) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.empty(), empty()));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.empty(), empty()));
         }
 
         default Builder.NodeB node(Label label) {
@@ -172,52 +172,52 @@ public interface Next {
 
         @Deprecated
         default Builder.NodeB node(String name, Properties properties) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.empty(), properties));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.empty(), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Label label) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.of(label), empty()));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.of(label), empty()));
         }
 
         @Deprecated
-        default Builder.NodeB node(Ref name, Label label) {
+        default Builder.NodeB node(Var name, Label label) {
             return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.ofAll(labels), empty()));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.ofAll(labels), empty()));
         }
 
-        default Builder.NodeB node(Ref name, Iterable<Label> labels) {
+        default Builder.NodeB node(Var name, Iterable<Label> labels) {
             return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Label label, Properties properties) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.of(label), properties));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.of(label), properties));
         }
 
-        default Builder.NodeB node(Ref name, Label label, Properties properties) {
+        default Builder.NodeB node(Var name, Label label, Properties properties) {
             return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels, Properties properties) {
-            return node(fNode(Option.of(Ref.of(name)), LinkedHashSet.ofAll(labels), properties));
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.ofAll(labels), properties));
         }
 
-        default Builder.NodeB node(Ref name, Iterable<Label> labels, Properties properties) {
+        default Builder.NodeB node(Var name, Iterable<Label> labels, Properties properties) {
             return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, com.fredhonorio.neu.type.Node node) {
-            return node(fNode(Option.of(Ref.of(name)), node.labels, node.properties));
+            return node(fNode(Option.of(Var.of(name)), node.labels, node.properties));
         }
 
-        default Builder.NodeB node(Ref name, com.fredhonorio.neu.type.Node node) {
+        default Builder.NodeB node(Var name, com.fredhonorio.neu.type.Node node) {
             return node(fNode(Option.of(name), node.labels, node.properties));
         }
 
@@ -228,7 +228,7 @@ public interface Next {
 
     interface From extends Fragments {
         @Deprecated
-        default Builder.FromB from(Ref name) {
+        default Builder.FromB from(Var name) {
             return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, some(name), none(), empty())));
         }
     }
@@ -250,22 +250,22 @@ public interface Next {
 
         @Deprecated
         default Builder.ToB to(String n, String s) {
-            return to(Ref.of(n), Type.of(s));
+            return to(Var.of(n), Type.of(s));
         }
 
-        default Builder.ToB to(Ref name, WithType withType) {
+        default Builder.ToB to(Var name, WithType withType) {
             return to(name, withType.type());
         }
 
-        default Builder.ToB to(Ref name, Type type) {
+        default Builder.ToB to(Var name, Type type) {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), empty())));
         }
 
-        default Builder.ToB to(Ref name) {
+        default Builder.ToB to(Var name) {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), none(), empty())));
         }
 
-        default Builder.ToB to(Ref name, Properties properties) {
+        default Builder.ToB to(Var name, Properties properties) {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), none(), properties)));
         }
 
@@ -278,7 +278,7 @@ public interface Next {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(type), props)));
         }
 
-        default Builder.ToB to(Ref name, Type type, Properties props) {
+        default Builder.ToB to(Var name, Type type, Properties props) {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), props)));
         }
 
