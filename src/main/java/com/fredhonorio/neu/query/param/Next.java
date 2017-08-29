@@ -3,18 +3,21 @@ package com.fredhonorio.neu.query.param;
 import com.fredhonorio.neu.query.AsString;
 import com.fredhonorio.neu.query.Ref;
 import com.fredhonorio.neu.query.Statement;
+import com.fredhonorio.neu.query.WithType;
 import com.fredhonorio.neu.type.*;
-import javaslang.*;
+import com.fredhonorio.neu.util.Strings;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
 import javaslang.collection.List;
-import javaslang.collection.Tree;
+import javaslang.collection.Seq;
 import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
 import java.util.function.Function;
 
 import static com.fredhonorio.neu.query.param.Fragment.Node.fNode;
-import static javaslang.collection.LinkedHashSet.empty;
+import static com.fredhonorio.neu.type.Properties.empty;
 import static javaslang.control.Option.none;
 import static javaslang.control.Option.some;
 
@@ -71,7 +74,7 @@ public interface Next {
         }
 
         @Deprecated
-        default Builder.StrB return_(String...parts) {
+        default Builder.StrB return_(String... parts) {
             return s("RETURN").s(List.of(parts).mkString(", "));
         }
 
@@ -116,7 +119,7 @@ public interface Next {
             return s("RETURN").s(s);
         }
 
-        default Builder.StrB Return(String...parts) {
+        default Builder.StrB Return(String... parts) {
             return s("RETURN").s(List.of(parts).mkString(", "));
         }
     }
@@ -127,19 +130,19 @@ public interface Next {
         }
 
         default Builder.NodeB node() {
-            return node(fNode(none(), empty(), Properties.empty()));
+            return node(fNode(none(), LinkedHashSet.empty(), empty()));
         }
 
         default Builder.NodeB node(String name) {
-            return node(fNode(Option.of(name), empty(), Properties.empty()));
+            return node(fNode(Option.of(name), LinkedHashSet.empty(), empty()));
         }
 
         default Builder.NodeB node(Label label) {
-            return node(fNode(Option.none(), LinkedHashSet.of(label), Properties.empty()));
+            return node(fNode(Option.none(), LinkedHashSet.of(label), empty()));
         }
 
         default Builder.NodeB node(Iterable<Label> labels) {
-            return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), Properties.empty()));
+            return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), empty()));
         }
 
         default Builder.NodeB node(Label label, Properties properties) {
@@ -151,29 +154,29 @@ public interface Next {
         }
 
         default Builder.NodeB node(Properties properties) {
-            return node(fNode(none(), empty(), properties));
+            return node(fNode(none(), LinkedHashSet.empty(), properties));
         }
 
         default Builder.NodeB node(String name, Properties properties) {
-            return node(fNode(Option.of(name), empty(), properties));
+            return node(fNode(Option.of(name), LinkedHashSet.empty(), properties));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Label label) {
-            return node(fNode(Option.of(name), LinkedHashSet.of(label), Properties.empty()));
+            return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
         }
 
         default Builder.NodeB node(Ref name, Label label) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), Properties.empty()));
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.of(label), empty()));
         }
 
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels) {
-            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), Properties.empty()));
+            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
         }
 
         default Builder.NodeB node(Ref name, Iterable<Label> labels) {
-            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), Properties.empty()));
+            return node(fNode(Option.of(name.asString()), LinkedHashSet.ofAll(labels), empty()));
         }
 
         @Deprecated
@@ -210,33 +213,59 @@ public interface Next {
 
     interface From extends Fragments {
         default Builder.FromB from(Ref name) {
-            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, Option.some(name), none())));
-        }
-
-        @Deprecated
-        default Builder.FromB from(String s) {
-            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, Option.some(Ref.of(s)), none())));
+            return new Builder.FromB(fragments().append(new Fragment.Rel(Fragment.Dir.FROM, some(name), none(), empty())));
         }
     }
 
     interface To extends Fragments {
+
+        default Builder.ToB to() {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), none(), empty())));
+        }
+
         @Deprecated
         default Builder.ToB to(String s) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(Type.of(s)))));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(Type.of(s)), empty())));
         }
 
         default Builder.ToB to(Type type) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), Option.some(type))));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(type), empty())));
         }
 
         @Deprecated
         default Builder.ToB to(String n, String s) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(Ref.of(n)), Option.some(Type.of(s)))));
+            return to(Ref.of(n), Type.of(s));
+        }
+
+        default Builder.ToB to(Ref name, WithType withType) {
+            return to(name, withType.type());
         }
 
         default Builder.ToB to(Ref name, Type type) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), Option.some(type))));
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), empty())));
         }
+
+        default Builder.ToB to(Ref name) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), none(), empty())));
+        }
+
+        default Builder.ToB to(Ref name, Properties properties) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), none(), properties)));
+        }
+
+
+        default Builder.ToB to(Properties props) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), none(), props)));
+        }
+
+        default Builder.ToB to(Type type, Properties props) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(type), props)));
+        }
+
+        default Builder.ToB to(Ref name, Type type, Properties props) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), props)));
+        }
+
     }
 
     interface Param extends Fragments {
@@ -253,8 +282,8 @@ public interface Next {
             List<Integer> indices = fragments
                 .scanLeft(0, (z, f) -> z + f.match(
                     str -> 0,
-                    node -> 1,
-                    rel -> 0,
+                    node -> node.node.properties.nonEmpty() ? 1 : 0,
+                    rel -> rel.properties.nonEmpty() ? 1 : 0,
                     param -> 1
                 ));
 
@@ -277,21 +306,49 @@ public interface Next {
         return f.match(
             str -> Tuple.of(str.s, empty),
             node -> nodeFragment(node, idx),
-            rel -> Tuple.of(rel.pattern(), empty),
+            rel -> relFragment(rel, idx),
             param -> Tuple.of("$_" + idx, TreeMap.of("_" + idx, param.parameter))
         );
     }
 
     static Tuple2<String, TreeMap<String, Parameter>> nodeFragment(Fragment.Node f, int idx) {
-        Function<String, String> propName = prop -> "_" + idx + "_" + prop.replace('-', '_'); // TODO: fix escaping this as a reference
+        Function<Long, String> propName = propIdx -> Strings.concat("_", Long.toString(idx), "_", Long.toString(propIdx));
 
-        List<Tuple2<String, Parameter>> parameters = f.node.properties.asMap().toList()
-            .map(kv -> kv.map(propName, Property::asParam));
+        Seq<Tuple2<String, Parameter>> parameterValues = f.node.properties.asMap().zipWithIndex()
+            .map(t -> {
+                    long index = t._2;
+                    Property prop = t._1._2;
+                    return Tuple.of(
+                        propName.apply(index),
+                        Property.asParam(prop)
+                    );
+                }
+            );
 
         return Tuple.of(
             f.pattern(propName),
-            TreeMap.ofEntries(parameters)
+            TreeMap.ofEntries(parameterValues)
         );
     }
 
+    // TODO: dedup
+    static Tuple2<String, TreeMap<String, Parameter>> relFragment(Fragment.Rel f, int idx) {
+        Function<Long, String> propName = propIdx -> Strings.concat("_", Long.toString(idx), "_", Long.toString(propIdx));
+
+        Seq<Tuple2<String, Parameter>> parameterValues = f.properties.asMap().zipWithIndex()
+            .map(t -> {
+                    long index = t._2;
+                    Property prop = t._1._2;
+                    return Tuple.of(
+                        propName.apply(index),
+                        Property.asParam(prop)
+                    );
+                }
+            );
+
+        return Tuple.of(
+            f.pattern(propName),
+            TreeMap.ofEntries(parameterValues)
+        );
+    }
 }
