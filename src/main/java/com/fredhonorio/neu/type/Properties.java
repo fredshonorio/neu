@@ -3,6 +3,8 @@ package com.fredhonorio.neu.type;
 import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
+import java.util.function.Function;
+
 public class Properties {
     private final TreeMap<String, Property> properties;
 
@@ -39,6 +41,10 @@ public class Properties {
         return prop.map(p -> put(k, p)).getOrElse(this);
     }
 
+    public <T> Properties putIfDefined(String k, Option<T> prop, Function<T, Property> converter) {
+        return prop.map(p -> put(k, converter.apply(p))).getOrElse(this);
+    }
+
     public static Properties of(String k, Property v) {
         return new Properties(TreeMap.of(k, v));
     }
@@ -67,6 +73,10 @@ public class Properties {
         return properties.isEmpty();
     }
 
+    public boolean nonEmpty() {
+        return !isEmpty();
+    }
+
     public Result asResult() {
         return new NResultMap(properties.mapValues(Property::asResult));
     }
@@ -76,12 +86,6 @@ public class Properties {
             .toList()
             .map(t -> t._1 + "=" + t._2)
             .mkString(", ");
-    }
-
-    public String pattern(String nodeName) {
-        return properties.keySet()
-            .map(key -> key + ": $" + nodeName + "." + key)
-            .mkString("{", ",", "}");
     }
 
     @Override

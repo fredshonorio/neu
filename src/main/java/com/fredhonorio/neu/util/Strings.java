@@ -21,4 +21,8 @@ public class Strings {
 
         return s.toString();
     }
+
+    public static String printf(String format, String...xs) {
+        return String.format(format, (Object[]) xs);
+    }
 }

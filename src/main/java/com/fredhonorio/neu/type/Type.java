@@ -4,7 +4,7 @@ public class Type {
 
     public final String type;
 
-    public Type(String type) {
+    private Type(String type) {
         // TODO: sanitize type
         this.type = type;
     }
