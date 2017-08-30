@@ -8,8 +8,8 @@ plugins {
 }
 
 sourceCompatibility = targetCompatibility = 1.8
-version = '0.1.0'
-project.group = "net.meshapp"
+version = '0.1.1'
+project.group = "com.fredhonorio"
 
 apply from: 'release.gradle'
 
