@@ -145,9 +145,33 @@ public interface Next {
             return node(fNode(none(), LinkedHashSet.empty(), empty()));
         }
 
-        @Deprecated
-        default Builder.NodeB node(String name) {
-            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.empty(), empty()));
+        // with var
+        default Builder.NodeB node(Var name) {
+            return node(fNode(Option.of(name), LinkedHashSet.empty(), empty()));
+        }
+
+        default Builder.NodeB node(Var name, Label label) {
+            return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
+        }
+
+        default Builder.NodeB node(Var name, Iterable<Label> labels) {
+            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
+        }
+
+        default Builder.NodeB node(Var name, Properties properties) {
+            return node(fNode(Option.of(name), LinkedHashSet.empty(), properties));
+        }
+
+        default Builder.NodeB node(Var name, Label label, Properties properties) {
+            return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
+        }
+
+        default Builder.NodeB node(Var name, Iterable<Label> labels, Properties properties) {
+            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
+        }
+
+        default Builder.NodeB node(Var name, com.fredhonorio.neu.type.Node node) {
+            return node(fNode(Option.of(name), node.labels, node.properties));
         }
 
         default Builder.NodeB node(Label label) {
@@ -158,6 +182,10 @@ public interface Next {
             return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), empty()));
         }
 
+        default Builder.NodeB node(Properties properties) {
+            return node(fNode(Option.none(), LinkedHashSet.empty(), properties));
+        }
+
         default Builder.NodeB node(Label label, Properties properties) {
             return node(fNode(Option.none(), LinkedHashSet.of(label), properties));
         }
@@ -166,8 +194,13 @@ public interface Next {
             return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), properties));
         }
 
-        default Builder.NodeB node(Properties properties) {
-            return node(fNode(none(), LinkedHashSet.empty(), properties));
+        default Builder.NodeB node(com.fredhonorio.neu.type.Node node) {
+            return node(fNode(Option.none(), node.labels, node.properties));
+        }
+
+        @Deprecated
+        default Builder.NodeB node(String name) {
+            return node(fNode(Option.of(Var.of(name)), LinkedHashSet.empty(), empty()));
         }
 
         @Deprecated
@@ -181,17 +214,8 @@ public interface Next {
         }
 
         @Deprecated
-        default Builder.NodeB node(Var name, Label label) {
-            return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
-        }
-
-        @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels) {
             return node(fNode(Option.of(Var.of(name)), LinkedHashSet.ofAll(labels), empty()));
-        }
-
-        default Builder.NodeB node(Var name, Iterable<Label> labels) {
-            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
         }
 
         @Deprecated
@@ -199,30 +223,14 @@ public interface Next {
             return node(fNode(Option.of(Var.of(name)), LinkedHashSet.of(label), properties));
         }
 
-        default Builder.NodeB node(Var name, Label label, Properties properties) {
-            return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
-        }
-
         @Deprecated
         default Builder.NodeB node(String name, Iterable<Label> labels, Properties properties) {
             return node(fNode(Option.of(Var.of(name)), LinkedHashSet.ofAll(labels), properties));
         }
 
-        default Builder.NodeB node(Var name, Iterable<Label> labels, Properties properties) {
-            return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
-        }
-
         @Deprecated
         default Builder.NodeB node(String name, com.fredhonorio.neu.type.Node node) {
             return node(fNode(Option.of(Var.of(name)), node.labels, node.properties));
-        }
-
-        default Builder.NodeB node(Var name, com.fredhonorio.neu.type.Node node) {
-            return node(fNode(Option.of(name), node.labels, node.properties));
-        }
-
-        default Builder.NodeB node(com.fredhonorio.neu.type.Node node) {
-            return node(fNode(Option.none(), node.labels, node.properties));
         }
     }
 
