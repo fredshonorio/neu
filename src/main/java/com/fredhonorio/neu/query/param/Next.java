@@ -28,6 +28,10 @@ public interface Next {
             return new Builder.StrB(fragments().append(new Fragment.Str(s)));
         }
 
+        default Builder.StrB s(Exp s) {
+            return new Builder.StrB(fragments().append(new Fragment.Str(s.value)));
+        }
+
         @Deprecated
         default Builder.StrB match() {
             return s("MATCH");
@@ -116,14 +120,12 @@ public interface Next {
             return s("DELETE");
         }
 
-        @Deprecated
-        default Builder.StrB Return(String s) {
-            return s("RETURN").s(s);
+        default Builder.StrB Return(Exp exp) {
+            return s("RETURN").s(exp.asString());
         }
 
-        @Deprecated
-        default Builder.StrB Return(String... parts) {
-            return s("RETURN").s(List.of(parts).mkString(", "));
+        default Builder.StrB Return(Exp... exps) {
+            return s("RETURN").s(List.of(exps).map(Exp::asString).mkString(", "));
         }
 
         default Builder.StrB Limit(long limit) {
