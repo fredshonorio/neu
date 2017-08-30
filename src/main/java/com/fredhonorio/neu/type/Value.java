@@ -108,6 +108,8 @@ public interface Value {
         return new NParamMap(TreeMap.of(k, v));
     }
 
+    // TODO: String -> X -> NParamMap, for every primitive X
+
     public static NParamMap paramMap(Map<String, Parameter> map) {
         return new NParamMap(Util.toTreeMap(map));
     }
