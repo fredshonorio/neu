@@ -103,6 +103,12 @@ public interface Value {
         return new NPropList(List.ofAll(xs).map(Value::value));
     }
 
+    public static NPropList propList(Iterable<Primitive> xs) {
+        return new NPropList(List.ofAll(xs));
+    }
+
+    // TODO: add a test to ensure that nested lists are invalid properties
+
     // param map
     public static NParamMap paramMap(String k, Parameter v) {
         return new NParamMap(TreeMap.of(k, v));
