@@ -14,6 +14,6 @@ public class Var extends Exp {
     }
 
     public Exp dot(Field f) {
-        return new Exp(concat(asString(), ".", f.name()));
+        return new Exp(concat(asString(), ".", f.fieldName()));
     }
 }
