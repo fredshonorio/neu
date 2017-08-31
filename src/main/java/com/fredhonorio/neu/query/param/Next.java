@@ -136,6 +136,9 @@ public interface Next {
             return s("SKIP").s(Long.toString(skip));
         }
 
+        default Builder.StrB inject(Iterable<Fragment> fragments) {
+            return new Builder.StrB(fragments().appendAll(fragments));
+        }
     }
 
     interface Node extends Fragments {
