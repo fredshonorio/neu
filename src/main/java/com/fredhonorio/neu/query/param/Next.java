@@ -282,6 +282,17 @@ public interface Next {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), none(), properties)));
         }
 
+        default Builder.ToB to(Var name, Type type, Properties props) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), props)));
+        }
+
+        default Builder.ToB to(Var name, WithType type, Properties props) {
+            return to(name, type.type(), props);
+        }
+
+        default Builder.ToB to(Var name, Relationship relationship) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(relationship.type), relationship.properties)));
+        }
 
         default Builder.ToB to(Properties props) {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), none(), props)));
@@ -291,8 +302,12 @@ public interface Next {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(type), props)));
         }
 
-        default Builder.ToB to(Var name, Type type, Properties props) {
-            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), props)));
+        default Builder.ToB to(WithType type, Properties props) {
+            return to(type.type(), props);
+        }
+
+        default Builder.ToB to(Relationship relationship) {
+            return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(relationship.type), relationship.properties)));
         }
 
     }
