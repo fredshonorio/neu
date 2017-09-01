@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import static javaslang.control.Option.some;
 
-// This value can be returned in a result
+// This value can be returned in a query result
 public interface Result extends Value {
     public <T> T matchResult(
         Function<NBoolean, T> bool,
