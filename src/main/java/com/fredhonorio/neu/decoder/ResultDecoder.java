@@ -14,6 +14,13 @@ import javaslang.control.Try;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * Primitive decoders are named after the java type of the value, specifically, the decoder for the cypher type Integer
+ * is named Long because it returns a long, thus avoiding confusion.
+ * The wrappers for the cypher types are consistent with cypher terminology, and so the type for Integer is NInteger.
+ * This is hopefully ok because it's not likely that the wrappers are used directly
+ * @param <T>
+ */
 public interface ResultDecoder<T> {
     Either<String, T> decode(Result from);
 
@@ -54,8 +61,10 @@ public interface ResultDecoder<T> {
 
     public static ResultDecoder<Result> Value = Either::right;
     public static ResultDecoder<Boolean> Bool = is(Result::asBoolean, "boolean");
-    public static ResultDecoder<Double> Float = is(Result::asDouble, "float");
-    public static ResultDecoder<Long> Integer = is(Result::asLong, "long");
+    public static ResultDecoder<Double> Double = is(Result::asDouble, "float");
+    public static ResultDecoder<Float> Float = Double.mapTry(java.lang.Double::floatValue);
+    public static ResultDecoder<Long> Long = is(Result::asLong, "long");
+    public static ResultDecoder<Integer> Integer = Long.mapTry(java.lang.Long::intValue);
     public static ResultDecoder<NResultList> List = is(Result::asResultList, "list");
     public static ResultDecoder<NResultMap> Map = is(Result::asResultMap, "map");
     public static ResultDecoder<String> String = is(Result::asString, "string");
