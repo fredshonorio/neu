@@ -2,13 +2,14 @@ package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.type.NResultMap;
 import com.fredhonorio.neu.type.Result;
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.TreeMap;
 
 public class Record {
 
-    public final TreeMap<String, Result> items;
+    public final LinkedHashMap<String, Result> items;
 
-    public Record(TreeMap<String, Result> items) {
+    public Record(LinkedHashMap<String, Result> items) {
         this.items = items;
     }
 
@@ -33,6 +34,6 @@ public class Record {
     }
 
     public NResultMap asResult() {
-        return new NResultMap(items);
+        return new NResultMap(TreeMap.ofEntries(items.toList()));
     }
 }

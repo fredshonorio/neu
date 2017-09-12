@@ -38,14 +38,14 @@ public class Read {
             .flatMap(Try::sequence);
     }
 
-    private static Try<Record> parseRecord(org.neo4j.driver.v1.Record r) {
+    public static Try<Record> parseRecord(org.neo4j.driver.v1.Record r) {
         return Try.of(() -> decode(r));
     }
 
     private static Record decode(org.neo4j.driver.v1.Record record) throws IllegalStateException {
-        TreeMap<String, Result> items = List.ofAll(record.keys())
+        LinkedHashMap<String, Result> items = List.ofAll(record.keys())
             .map(key -> Tuple.of(key, value(record.get(key))))
-            .transform(TreeMap::ofEntries);
+            .transform(LinkedHashMap::ofEntries);
 
         return new Record(items);
     }
