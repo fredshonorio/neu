@@ -9,7 +9,12 @@ public class Var extends Exp {
         super(value);
     }
 
+
     public static Var of(String name) {
+        return new Var(name);
+    }
+
+    public static Var var(String name) {
         return new Var(name);
     }
 

@@ -26,4 +26,12 @@ public class Exp extends Boxed<String> {
     public static Exp collect(Exp exp) {
         return new Exp(concat("collect(", exp.asString(), ")"));
     }
+
+    public static Exp collectDistinct(Exp exp) {
+        return new Exp(concat("collect(distinct", exp.asString(), ")"));
+    }
+
+    public static Exp countDistinct(Exp exp) {
+        return new Exp(concat("count(distinct", exp.asString(), ")"));
+    }
 }
