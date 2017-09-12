@@ -31,7 +31,7 @@ public class Write {
         return result;
     }
 
-    private static org.neo4j.driver.v1.Statement toNative(Statement statement) {
+    public static org.neo4j.driver.v1.Statement toNative(Statement statement) {
         String q = statement.queryTemplate;
         NParamMap params = statement.params;
 
