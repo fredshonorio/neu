@@ -1,11 +1,10 @@
 package com.fredhonorio.neu.query.param;
 
 import com.fredhonorio.neu.query.Exp;
-import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.query.Statement;
+import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.query.WithType;
 import com.fredhonorio.neu.type.*;
-import com.fredhonorio.neu.util.Strings;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
@@ -18,6 +17,7 @@ import java.util.function.Function;
 
 import static com.fredhonorio.neu.query.param.Fragment.Node.fNode;
 import static com.fredhonorio.neu.type.Properties.empty;
+import static com.fredhonorio.neu.util.Strings.concat;
 import static javaslang.control.Option.none;
 import static javaslang.control.Option.some;
 
@@ -82,18 +82,12 @@ public interface Next {
             return s("RETURN").s(List.of(parts).mkString(", "));
         }
 
-        //
         default Builder.StrB Match() {
             return s("MATCH");
         }
 
         default Builder.StrB With() {
             return s("WITH");
-        }
-
-        @Deprecated
-        default Builder.StrB With(String... parts) {
-            return With().s(List.of(parts).mkString(", "));
         }
 
         default <T extends Exp> Builder.StrB With(T... parts) {
@@ -134,6 +128,75 @@ public interface Next {
 
         default Builder.StrB Skip(long skip) {
             return s("SKIP").s(Long.toString(skip));
+        }
+
+        default Builder.StrB OrderBy(Iterable<OrderByClause> clauses) {
+            String text = List.ofAll(clauses)
+                .map(c -> concat(c.exp.asString(), " ", c.order.cypher()))
+                .mkString(",");
+
+            return s("ORDER BY").s(text);
+        }
+
+        default Builder.StrB OrderBy(OrderByClause clause) {
+            return OrderBy(List.of(clause));
+        }
+
+        default Builder.StrB OrderBy(OrderByClause... clauses) {
+            return OrderBy(List.of(clauses));
+        }
+
+        default Builder.StrB OrderBy(Exp exp) {
+            return OrderBy(List.of(OrderByClause.asc(exp)));
+        }
+
+        default Builder.StrB OrderBy(Exp exp, OrderByClause.Order order) {
+            return OrderBy(List.of(new OrderByClause(order, exp)));
+        }
+
+        default Builder.StrB eq() {
+            return s("=");
+        }
+
+        default Builder.StrB eq(Exp exp) {
+            return eq().s(exp);
+        }
+
+        default Builder.ParamB eq(Parameter param) {
+            return eq().param(param);
+        }
+
+        default Builder.StrB gt() {
+            return s(">");
+        }
+
+        default Builder.StrB gt(Exp exp) {
+            return gt().s(exp);
+        }
+
+        default Builder.ParamB gt(Parameter param) {
+            return gt().param(param);
+        }
+
+        default Builder.StrB in() {
+            return s("in");
+        }
+
+        default Builder.StrB in(Exp exp) {
+            return in().s(exp);
+        }
+
+        default Builder.ParamB in(Parameter param) {
+            return in().param(param);
+        }
+
+
+        default Builder.StrB and() {
+            return s("AND");
+        }
+
+        default Builder.StrB not() {
+            return s("NOT");
         }
 
         default Builder.StrB inject(Iterable<Fragment> fragments) {
@@ -356,7 +419,7 @@ public interface Next {
     }
 
     static Tuple2<String, TreeMap<String, Parameter>> nodeFragment(Fragment.Node f, int idx) {
-        Function<Long, String> propName = propIdx -> Strings.concat("_", Long.toString(idx), "_", Long.toString(propIdx));
+        Function<Long, String> propName = propIdx -> concat("_", Long.toString(idx), "_", Long.toString(propIdx));
 
         Seq<Tuple2<String, Parameter>> parameterValues = f.node.properties.asMap().zipWithIndex()
             .map(t -> {
@@ -374,7 +437,7 @@ public interface Next {
 
     // TODO: dedup
     static Tuple2<String, TreeMap<String, Parameter>> relFragment(Fragment.Rel f, int idx) {
-        Function<Long, String> propName = propIdx -> Strings.concat("_", Long.toString(idx), "_", Long.toString(propIdx));
+        Function<Long, String> propName = propIdx -> concat("_", Long.toString(idx), "_", Long.toString(propIdx));
 
         Seq<Tuple2<String, Parameter>> parameterValues = f.properties.asMap().zipWithIndex()
             .map(t -> {
