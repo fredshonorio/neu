@@ -4,72 +4,85 @@ import com.fredhonorio.neu.decoder.ResultDecoder;
 import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.type.NParamMap;
 import com.fredhonorio.neu.type.Node;
-import javaslang.concurrent.Future;
 import javaslang.control.Try;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
+import org.neo4j.driver.v1.*;
 
+import static com.fredhonorio.neu.decoder.ResultDecoder.Integer;
+import static com.fredhonorio.neu.decoder.ResultDecoder.Node;
+import static com.fredhonorio.neu.decoder.ResultDecoder.field;
 import static com.fredhonorio.neu.op.Ops.result;
 import static com.fredhonorio.neu.op.Ops.single;
 import static com.fredhonorio.neu.type.Value.value;
+import static com.fredhonorio.neu.util.TryExtra.unsafe;
 
 public class Interpreters {
 
-    public static Interpreter transaction(final Driver driver) {
+    public static Interpreter writeTransaction(final Driver driver) {
         return new Interpreter() {
             @Override
             public <T> Try<T> submit(GraphDB<T> op) {
                 Try<Session> session = Try.of(driver::session);
-                Try<T> res = session
-                    .mapTry(s -> s.writeTransaction(tx ->
-                            Try.of(() -> op.run(tx)).get()
-                        )
-                    );
-
+                Try<T> res = session.mapTry(s -> s.writeTransaction(tx -> unsafe(() -> op.run(tx))));
                 return session.andThenTry(Session::close) // close session
                     .flatMap(__ -> res);
             }
         };
     }
 
-    public static Interpreter readOnly(final Driver driver) {
+    public static Interpreter readTransaction(final Driver driver) {
         return new Interpreter() {
             @Override
             public <T> Try<T> submit(GraphDB<T> op) {
                 Try<Session> session = Try.of(driver::session);
-                Try<T> res = session
-                    .mapTry(s -> s.writeTransaction(tx ->
-                            Try.of(() -> op.run(tx)).get()
-                        )
-                    );
-
+                Try<T> res = session.mapTry(s -> s.readTransaction(tx -> unsafe(() -> op.run(tx))));
                 return session.andThenTry(Session::close) // close session
                     .flatMap(__ -> res);
             }
         };
     }
 
+    public static Interpreter readSession(final Driver driver) {
+        return new Interpreter() {
+            @Override
+            public <T> Try<T> submit(GraphDB<T> op) {
+                Try<Session> session = Try.of(() -> driver.session(AccessMode.READ));
+                Try<T> res = session.mapTry(s -> unsafe(() -> op.run(s)));
+                return session.andThenTry(Session::close) // close session
+                    .flatMap(__ -> res);
+            }
+        };
+    }
+
+    public static Interpreter writeSession(final Driver driver) {
+        return new Interpreter() {
+            @Override
+            public <T> Try<T> submit(GraphDB<T> op) {
+                Try<Session> session = Try.of(() -> driver.session(AccessMode.WRITE));
+                Try<T> res = session.mapTry(s -> unsafe(() -> op.run(s)));
+                return session.andThenTry(Session::close) // close session
+                    .flatMap(__ -> res);
+            }
+        };
+    }
 
     public static void main(String[] args) {
 
-        Driver d = GraphDatabase.driver("bolt://localhost");
-        Interpreter tx = transaction(d);
-        Interpreter ro = readOnly(d);
+        Driver driver = GraphDatabase.driver("bolt://localhost");
+        Interpreter tx = writeTransaction(driver);
+        Interpreter ro = readSession(driver);
 
         GraphDB<StatementResult> writeX = result(Statement.of("CREATE (:X {a: 1})"));
         GraphDB<StatementResult> writeY = result(Statement.of("CREATE (:Y {b: 2, a: 1})"));
 
         GraphDB<Integer> readYb = single(
             Statement.of("MATCH (i:Y {b: 2}) RETURN i.a as a"),
-            ResultDecoder.field("a", ResultDecoder.Integer)
+            field("a", Integer)
         );
 
         GraphDB<Node> readXbyYb = readYb.flatMap(yB ->
             single(
-                new Statement("MATCH (i:X {a: $0}) RETURN i", NParamMap.empty().put("0", value(yB))),
-                ResultDecoder.field("i", ResultDecoder.Node)))
+                new Statement("MATCH (i:X {a: $0}) RETURN i", NParamMap.of("0", value(yB))),
+                field("i", Node)))
             .map(n -> n.node);
 
         tx.submit(GraphDB.sequence(writeX, writeY)).get();
@@ -78,7 +91,5 @@ public class Interpreters {
 
         System.out.println(node);
     }
-
-
 }
 
