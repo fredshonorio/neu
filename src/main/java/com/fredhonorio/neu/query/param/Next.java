@@ -3,7 +3,7 @@ package com.fredhonorio.neu.query.param;
 import com.fredhonorio.neu.query.Exp;
 import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.query.Var;
-import com.fredhonorio.neu.query.WithType;
+import com.fredhonorio.neu.query.ToType;
 import com.fredhonorio.neu.type.*;
 import javaslang.Tuple;
 import javaslang.Tuple2;
@@ -294,8 +294,8 @@ public interface Next {
             return to(Var.of(n), Type.of(s));
         }
 
-        default Builder.ToB to(Var name, WithType withType) {
-            return to(name, withType.type());
+        default Builder.ToB to(Var name, ToType toType) {
+            return to(name, toType.type());
         }
 
         default Builder.ToB to(Var name, Type type) {
@@ -314,7 +314,7 @@ public interface Next {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), some(type), props)));
         }
 
-        default Builder.ToB to(Var name, WithType type, Properties props) {
+        default Builder.ToB to(Var name, ToType type, Properties props) {
             return to(name, type.type(), props);
         }
 
@@ -330,7 +330,7 @@ public interface Next {
             return new Builder.ToB(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), some(type), props)));
         }
 
-        default Builder.ToB to(WithType type, Properties props) {
+        default Builder.ToB to(ToType type, Properties props) {
             return to(type.type(), props);
         }
 
