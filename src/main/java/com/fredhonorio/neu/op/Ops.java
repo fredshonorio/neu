@@ -16,24 +16,53 @@ import org.neo4j.driver.v1.StatementResult;
 
 public class Ops {
 
+    /**
+     * An action that executes a {@link Statement} and returns a {@link StatementResult}
+     * @param s the statement
+     */
     public static GraphDB<StatementResult> result(Statement s) {
         return tx -> tx.run(Write.toNative(s));
     }
 
+    /**
+     * An action that executes a native {@link org.neo4j.driver.v1.Statement} and returns a {@link StatementResult}
+     * @param s the statement
+     * @return
+     */
     public static GraphDB<StatementResult> result(org.neo4j.driver.v1.Statement s) {
         return tx -> tx.run(s);
     }
 
+    /**
+     * An action that executes a {@link Statement} and returns the whole list of {@link Record}s
+     * @param s the statement
+     */
     public static GraphDB<List<Record>> records(Statement s) {
         return result(s)
             .mapTry(Ops::records);
     }
 
+    /**
+     * An action that executes a {@link Statement} and returns the whole list of {@link Record}s, decoded by the given
+     * decoder.
+     * While decoding, the record is converted to a {@link com.fredhonorio.neu.type.NResultMap}.
+     * @param s the statement
+     * @param decoder the decoder
+     * @param <T> the type of the decoded value
+     */
     public static <T> GraphDB<List<T>> list(Statement s, ResultDecoder<T> decoder) {
         return records(s)
             .mapTry(rs -> decode(decoder, rs));
     }
 
+    /**
+     * An action that executes a {@link Statement} and returns the only {@link Record}, decoded by the given decoder.
+     * If there are no records, or more than one, the operation will fail.
+     * While decoding, the record is converted to a {@link com.fredhonorio.neu.type.NResultMap}.
+     * @param s the statement
+     * @param decoder the decoder
+     * @param <T> the type of the decoded value
+     */
     public static <T> GraphDB<T> single(Statement s, ResultDecoder<T> decoder) {
         return records(s)
             .mapTryChecked(records -> Assert.that(records, records.size() == 1, "Expecting a single record, got: " + records.size()))
@@ -41,6 +70,14 @@ public class Ops {
             .map(List::head);
     }
 
+    /**
+     * An action that executes a {@link Statement} and returns the first {@link Record}, decoded by the given decoder.
+     * If there are no records, the operation will fail.
+     * While decoding, the record is converted to a {@link com.fredhonorio.neu.type.NResultMap}.
+     * @param s the statement
+     * @param decoder the decoder
+     * @param <T> the type of the decoded value
+     */
     public static <T> GraphDB<T> first(Statement s, ResultDecoder<T> decoder) {
         return records(s)
             .mapTryChecked(records -> Assert.that(records, records.size() >= 1, "Expecting non-empty list of records"))
@@ -57,7 +94,6 @@ public class Ops {
             .map(Seq::toList);
     }
 
-    // this assumes it's ok to throw exceptions
     private static Try<List<Record>> records(StatementResult r) {
         return Stream.ofAll(r.list())
             .map(Read::parseRecord)
