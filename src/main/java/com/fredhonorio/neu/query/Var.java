@@ -1,14 +1,19 @@
 package com.fredhonorio.neu.query;
 
-import static com.fredhonorio.neu.util.Strings.concat;
+import javaslang.collection.List;
+
+import static com.fredhonorio.neu.query.param.Fragment.str;
+
 
 // https://neo4j.com/docs/developer-manual/current/cypher/syntax/variables/
 public class Var extends Exp {
 
-    private Var(String value) {
-        super(value);
-    }
+    public final String value;
 
+    private Var(String value) {
+        super(List.of(str(value)));
+        this.value = value;
+    }
 
     public static Var of(String name) {
         return new Var(name);
@@ -19,6 +24,6 @@ public class Var extends Exp {
     }
 
     public Exp dot(Field f) {
-        return new Exp(concat(asString(), ".", f.fieldName()));
+        return concat(this.fragments, ".", List.of(str(f.fieldName())));
     }
 }

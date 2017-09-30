@@ -145,4 +145,12 @@ public interface Fragment {
             }
             // @formatter:on
     }
+
+    public static Str str(String s) {
+        return new Str(s);
+    }
+
+    public static Param param(Parameter param) {
+        return new Param(param);
+    }
 }

@@ -67,7 +67,7 @@ public class ReadTest {
             driver,
             builder().Match().node(s, X).Return(s)
                 .build(),
-            field(s.asString(), nodeProps(field("id", ResultDecoder.String)))).get();
+            field(s.value, nodeProps(field("id", ResultDecoder.String)))).get();
 
         assertTrue(ids.eq(List.of("1", "2")));
     }

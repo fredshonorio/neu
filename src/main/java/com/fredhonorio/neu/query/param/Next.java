@@ -16,6 +16,7 @@ import javaslang.control.Option;
 import java.util.function.Function;
 
 import static com.fredhonorio.neu.query.param.Fragment.Node.fNode;
+import static com.fredhonorio.neu.query.param.Fragment.str;
 import static com.fredhonorio.neu.type.Properties.empty;
 import static com.fredhonorio.neu.util.Strings.concat;
 import static javaslang.control.Option.none;
@@ -28,8 +29,12 @@ public interface Next {
             return new Builder.StrB(fragments().append(new Fragment.Str(s)));
         }
 
+        default Builder.StrB f(List<Fragment> frags) {
+            return new Builder.StrB(fragments().appendAll(frags));
+        }
+
         default Builder.StrB s(Exp s) {
-            return new Builder.StrB(fragments().append(new Fragment.Str(s.value)));
+            return new Builder.StrB(fragments().appendAll(s.fragments));
         }
 
         @Deprecated
@@ -91,7 +96,11 @@ public interface Next {
         }
 
         default <T extends Exp> Builder.StrB With(T... parts) {
-            return With().s(List.of(parts).map(Exp::asString).mkString(", "));
+            return With().f(
+                List.of(parts)
+                    .map(exp -> exp.fragments)
+                    .intersperse(List.of(str(",")))
+                    .flatMap(Function.identity()));
         }
 
         default Builder.StrB Create() {
@@ -100,10 +109,6 @@ public interface Next {
 
         default Builder.StrB Merge() {
             return s("MERGE");
-        }
-
-        default Builder.StrB Merge(String s) {
-            return Merge().s(s);
         }
 
         default Builder.StrB Where() {
@@ -115,11 +120,15 @@ public interface Next {
         }
 
         default Builder.StrB Return(Exp exp) {
-            return s("RETURN").s(exp.asString());
+            return s("RETURN").s(exp);
         }
 
         default Builder.StrB Return(Exp... exps) {
-            return s("RETURN").s(List.of(exps).map(Exp::asString).mkString(", "));
+            return s("RETURN").f(
+                List.of(exps)
+                    .map(exp -> exp.fragments)
+                    .intersperse(List.of(str(",")))
+                    .flatMap(Function.identity()));
         }
 
         default Builder.StrB Limit(long limit) {
@@ -131,11 +140,12 @@ public interface Next {
         }
 
         default Builder.StrB OrderBy(Iterable<OrderByClause> clauses) {
-            String text = List.ofAll(clauses)
-                .map(c -> concat(c.exp.asString(), " ", c.order.cypher()))
-                .mkString(",");
+            List<Fragment> frags = List.ofAll(clauses)
+                .map(c -> c.exp.fragments.append(str(c.order.cypher())))
+                .intersperse(List.of(str(",")))
+                .flatMap(Function.identity());
 
-            return s("ORDER BY").s(text);
+            return s("ORDER BY").f(frags);
         }
 
         default Builder.StrB OrderBy(OrderByClause clause) {
@@ -152,51 +162,6 @@ public interface Next {
 
         default Builder.StrB OrderBy(Exp exp, OrderByClause.Order order) {
             return OrderBy(List.of(new OrderByClause(order, exp)));
-        }
-
-        default Builder.StrB eq() {
-            return s("=");
-        }
-
-        default Builder.StrB eq(Exp exp) {
-            return eq().s(exp);
-        }
-
-        default Builder.ParamB eq(Parameter param) {
-            return eq().param(param);
-        }
-
-        default Builder.StrB gt() {
-            return s(">");
-        }
-
-        default Builder.StrB gt(Exp exp) {
-            return gt().s(exp);
-        }
-
-        default Builder.ParamB gt(Parameter param) {
-            return gt().param(param);
-        }
-
-        default Builder.StrB in() {
-            return s("in");
-        }
-
-        default Builder.StrB in(Exp exp) {
-            return in().s(exp);
-        }
-
-        default Builder.ParamB in(Parameter param) {
-            return in().param(param);
-        }
-
-
-        default Builder.StrB and() {
-            return s("AND");
-        }
-
-        default Builder.StrB not() {
-            return s("NOT");
         }
 
         default Builder.StrB inject(Iterable<Fragment> fragments) {
