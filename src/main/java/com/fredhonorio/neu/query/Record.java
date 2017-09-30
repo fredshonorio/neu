@@ -2,6 +2,7 @@ package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.type.NResultMap;
 import com.fredhonorio.neu.type.Result;
+import com.fredhonorio.neu.util.Strings;
 import javaslang.collection.LinkedHashMap;
 import javaslang.collection.TreeMap;
 
@@ -15,7 +16,7 @@ public class Record {
 
     @Override
     public String toString() {
-        return "Record(" + items.toList().map(t -> t._1 + '=' + t._2.toString()).mkString(",") + ')';
+        return "Record(" + items.toList().map(t -> t._1 + '=' + t._2.toString()).transform(Strings.mkString(",")) + ')';
     }
 
     @Override

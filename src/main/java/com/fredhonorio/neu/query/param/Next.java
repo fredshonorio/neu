@@ -5,6 +5,7 @@ import com.fredhonorio.neu.query.Statement;
 import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.query.ToType;
 import com.fredhonorio.neu.type.*;
+import com.fredhonorio.neu.util.Strings;
 import javaslang.Tuple;
 import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
@@ -49,7 +50,7 @@ public interface Next {
 
         @Deprecated
         default Builder.StrB with(String... parts) {
-            return with().s(List.of(parts).mkString(", "));
+            return with().s(List.of(parts).transform(Strings.mkString(", ")));
         }
 
         @Deprecated
@@ -84,7 +85,7 @@ public interface Next {
 
         @Deprecated
         default Builder.StrB return_(String... parts) {
-            return s("RETURN").s(List.of(parts).mkString(", "));
+            return s("RETURN").s(List.of(parts).transform(Strings.mkString(", ")));
         }
 
         default Builder.StrB Match() {
@@ -362,7 +363,7 @@ public interface Next {
             List<Tuple2<String, TreeMap<String, Parameter>>> parts = fragments.zip(indices)
                 .map(x -> fragment(x._1, x._2));
 
-            String query = parts.map(Tuple2::_1).mkString(" ");
+            String query = parts.map(Tuple2::_1).transform(Strings.mkString(" "));
             TreeMap<String, Parameter> params = parts.map(Tuple2::_2).flatMap(javaslang.Value::toList).transform(TreeMap::ofEntries);
 
             return new Statement(query, new NParamMap(params));

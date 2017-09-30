@@ -5,6 +5,7 @@ import com.fredhonorio.neu.type.Label;
 import com.fredhonorio.neu.type.Parameter;
 import com.fredhonorio.neu.type.Properties;
 import com.fredhonorio.neu.type.Type;
+import com.fredhonorio.neu.util.Strings;
 import javaslang.Tuple2;
 import javaslang.collection.LinkedHashSet;
 import javaslang.collection.List;
@@ -60,7 +61,7 @@ public interface Fragment {
                 .map(pair ->
                     pair.transform((propName, propIndex) ->
                         "`" + propName + "`: $" + propToVarMapping.apply(propIndex)))
-                .mkString("{", ",", "}");
+                .transform(Strings.mkString("{", ",", "}"));
         }
 
         public static Node fNode(Option<Var> name, LinkedHashSet<Label> labels, Properties properties) {
@@ -123,7 +124,7 @@ public interface Fragment {
     static String showNodeOrRelationship(Option<Var> ref, List<String> typeOrLabels, Properties properties, Function<Long, String> propToVarMapping) {
 
         String typeOrLabelsStr = typeOrLabels.nonEmpty()
-                ? concat(":", typeOrLabels.mkString(":"))
+                ? concat(":", typeOrLabels.transform(Strings.mkString(":")))
                 : "";
 
         String propStr = properties.isEmpty()

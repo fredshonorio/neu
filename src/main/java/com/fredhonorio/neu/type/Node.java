@@ -1,5 +1,6 @@
 package com.fredhonorio.neu.type;
 
+import com.fredhonorio.neu.util.Strings;
 import javaslang.collection.LinkedHashSet;
 import com.fredhonorio.neu.model.IdAnd;
 
@@ -26,7 +27,7 @@ public class Node {
     }
 
     public String describe() {
-        return labels.map(e -> e.value).mkString(":")
+        return labels.map(e -> e.value).toList().transform(Strings.mkString(":"))
             + ", "
             + properties.describe();
     }

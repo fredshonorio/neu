@@ -1,6 +1,7 @@
 package com.fredhonorio.neu.decoder;
 
 import com.fredhonorio.neu.type.*;
+import com.fredhonorio.neu.util.Strings;
 import javaslang.*;
 import javaslang.collection.List;
 import javaslang.collection.Map;
@@ -246,7 +247,8 @@ public interface ResultDecoder<T> {
                     results
                         .map(Either::getLeft)
                         .prepend("Attempted multiple decoders, all failed:")
-                        .mkString("\n\t - ")));
+                        .toList()
+                        .transform(Strings.mkString("\n\t - "))));
         };
     }
 

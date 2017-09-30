@@ -1,5 +1,6 @@
 package com.fredhonorio.neu.type;
 
+import com.fredhonorio.neu.util.Strings;
 import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
@@ -85,7 +86,7 @@ public class Properties {
         return properties
             .toList()
             .map(t -> t._1 + "=" + t._2)
-            .mkString(", ");
+            .transform(Strings.mkString(", "));
     }
 
     @Override

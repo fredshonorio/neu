@@ -2,5 +2,3 @@
 ** model neo4j state in memory
 *** compare model with real instance
 * iteratees for streaming?
-
-* migrate all usages of Seq::mkString -> Seq::transform(Strings.mkString())

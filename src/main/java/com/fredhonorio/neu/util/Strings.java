@@ -1,5 +1,9 @@
 package com.fredhonorio.neu.util;
 
+import javaslang.collection.List;
+
+import java.util.function.Function;
+
 public class Strings {
 
     public static String concat(String... strs) {
@@ -10,6 +14,14 @@ public class Strings {
         }
 
         return s.toString();
+    }
+
+    public static Function<List<String>, String> mkString(String sep) {
+        return xs -> xs.mkString(sep);
+    }
+
+    public static Function<List<String>, String> mkString(String before, String sep, String after) {
+        return xs -> xs.mkString(before, sep, after);
     }
 
     public static String concat(Iterable<String> strs) {
