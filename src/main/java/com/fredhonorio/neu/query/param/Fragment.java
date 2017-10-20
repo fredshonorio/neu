@@ -51,11 +51,12 @@ public interface Fragment {
         }
 
         public String pattern(Function<Long, String> propToVarMapping) {
-            String middle = Fragment.showNodeOrRelationship(name, node.labels.toList().map(l -> l.value), node.properties, propToVarMapping);
+            String middle = Fragment.showNodeOrRelationship(name, false, node.labels.toList().map(l -> l.value), node.properties, propToVarMapping);
             return concat("(", middle, ")");
         }
 
         public static String propertyPattern(Properties props, Function<Long, String> propToVarMapping) {
+            // TODO: properly escape property
             return props.asMap().toList().map(Tuple2::_1)
                 .zipWithIndex()
                 .map(pair ->
@@ -92,10 +93,10 @@ public interface Fragment {
     public static final class Rel implements Fragment {
         public final Dir direction;
         public final Option<Var> name;
-        public final Option<Type> type;
+        public final List<Type> type;
         public final Properties properties;
 
-        public Rel(Dir direction, Option<Var> name, Option<Type> type, Properties properties) {
+        public Rel(Dir direction, Option<Var> name, List<Type> type, Properties properties) {
             this.direction = direction;
             this.name = name;
             this.type = type;
@@ -112,7 +113,7 @@ public interface Fragment {
             String left = direction == Dir.FROM ? "<-" : "-";
             String right = direction == Dir.TO ? "->" : "-";
 
-            String middle = Fragment.showNodeOrRelationship(name, type.map(t -> t.type).toList(), properties, propToVarMapping);
+            String middle = Fragment.showNodeOrRelationship(name, true, type.map(t -> t.type).toList(), properties, propToVarMapping);
 
             return !middle.isEmpty()
                 ? concat(left, "[", middle, "]", right)
@@ -121,10 +122,12 @@ public interface Fragment {
     }
 
     // private
-    static String showNodeOrRelationship(Option<Var> ref, List<String> typeOrLabels, Properties properties, Function<Long, String> propToVarMapping) {
+    static String showNodeOrRelationship(Option<Var> ref, boolean isRel, List<String> typeOrLabels, Properties properties, Function<Long, String> propToVarMapping) {
+
+        String typeOrLabelSep = isRel ? "|" : ":";
 
         String typeOrLabelsStr = typeOrLabels.nonEmpty()
-                ? concat(":", typeOrLabels.transform(Strings.mkString(":")))
+                ? concat(":", typeOrLabels.transform(Strings.mkString(typeOrLabelSep)))
                 : "";
 
         String propStr = properties.isEmpty()

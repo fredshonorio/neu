@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class BuilderTestTo {
 
-    private void testQuery(Function<Builder.EmptyB, Builder.StrB> x, String expected) {
+    private void testQuery(Function<Builder, Builder> x, String expected) {
         assertEquals(
             expected,
             x.apply(builder()).build().queryTemplate

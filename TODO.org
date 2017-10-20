@@ -2,3 +2,5 @@
 ** model neo4j state in memory
 *** compare model with real instance
 * iteratees for streaming?
+
+* mention mismatch regarding querying and creating relationships (you can match on many types, but a relationship can only have one)

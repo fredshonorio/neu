@@ -1,13 +1,14 @@
 package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.query.param.Fragment;
+import com.fredhonorio.neu.query.param.Fragments;
 import javaslang.collection.List;
 
 import static com.fredhonorio.neu.query.param.Fragment.param;
 import static com.fredhonorio.neu.query.param.Fragment.str;
 import static com.fredhonorio.neu.type.Value.value;
 
-public class Exp {
+public class Exp implements Fragments {
 
     static Exp concat(List<Fragment> a, String b, List<Fragment> c) {
         return new Exp(a.append(str(b)).appendAll(c));
@@ -94,4 +95,8 @@ public class Exp {
         return concat("count(distinct", exp.fragments, ")");
     }
 
+    @Override
+    public List<Fragment> fragments() {
+        return fragments;
+    }
 }

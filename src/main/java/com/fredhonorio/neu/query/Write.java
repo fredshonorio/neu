@@ -7,6 +7,7 @@ import org.neo4j.driver.internal.value.*;
 import org.neo4j.driver.v1.*;
 import org.neo4j.driver.v1.summary.ResultSummary;
 
+@Deprecated
 public class Write {
 
     public static Try<StatementResult> writeSession(Driver driver, Statement statement) {

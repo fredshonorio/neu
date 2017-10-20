@@ -27,7 +27,7 @@ public class BuilderTest {
         Write.writeSession(neo, builder().Match().node(n).s("DETACH DELETE").s(n).build());
     }
 
-    private void exec(Next.Final b) {
+    private void exec(Builder b) {
         Write.writeSession(neo, b.build()).get();
     }
 

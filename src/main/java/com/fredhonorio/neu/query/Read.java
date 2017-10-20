@@ -15,6 +15,7 @@ import java.util.Map;
 import static com.fredhonorio.neu.type.Value.*;
 import static org.neo4j.driver.internal.types.InternalTypeSystem.TYPE_SYSTEM;
 
+@Deprecated
 public class Read {
 
     public static Try<Seq<Record>> list(Driver driver, Statement statement) {
