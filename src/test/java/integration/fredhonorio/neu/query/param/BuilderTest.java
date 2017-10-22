@@ -1,41 +1,44 @@
-package com.fredhonorio.neu.query.param;
+package integration.fredhonorio.neu.query.param;
 
-import com.fredhonorio.neu.query.*;
+import com.fredhonorio.neu.Neo4jInstance;
+import com.fredhonorio.neu.decoder.ResultDecoder;
+import com.fredhonorio.neu.op.Interpreter;
+import com.fredhonorio.neu.op.Interpreters;
+import com.fredhonorio.neu.op.Ops;
+import com.fredhonorio.neu.query.Statement;
+import com.fredhonorio.neu.query.Var;
+import com.fredhonorio.neu.query.param.Builder;
 import com.fredhonorio.neu.type.Label;
 import com.fredhonorio.neu.type.Node;
 import com.fredhonorio.neu.type.Properties;
 import javaslang.collection.List;
-import javaslang.collection.Seq;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
 
 import static com.fredhonorio.neu.query.param.Builder.builder;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class BuilderTest {
 
-    private Driver neo = GraphDatabase.driver("bolt://localhost");
-    // Driver neo = Neo4jInProcess.build().driver();
-
-    private static final Var n = Var.of("n");
+    private Driver driver;
 
     @Before
     public void init() {
-        Write.writeSession(neo, builder().Match().node(n).s("DETACH DELETE").s(n).build());
+        driver = Neo4jInstance.clean();
     }
 
+    private static final Var n = Var.of("n");
+
     private void exec(Builder b) {
-        Write.writeSession(neo, b.build()).get();
+        Interpreters.writeSession(driver)
+            .submit(Ops.result(b.build())).get();
     }
 
     private Node queryOne() {
         Statement ALL = builder().Match().node(n).Return(n).build();
-        Seq<Record> list = Read.list(neo, ALL).get();
-        assertTrue("multiple nodes " + list, list.size() == 1);
-        return list.head().asResult().value.get("n").get().asNode().get().node;
+        Interpreter i = Interpreters.readSession(driver);
+        return i.submit(Ops.first(ALL, ResultDecoder.field("n", ResultDecoder.Node)).map(n -> n.node)).get();
     }
 
     // unlabeled

@@ -64,32 +64,5 @@ public class Interpreters {
             }
         };
     }
-
-    public static void main(String[] args) {
-
-        Driver driver = GraphDatabase.driver("bolt://localhost");
-        Interpreter tx = writeTransaction(driver);
-        Interpreter ro = readSession(driver);
-
-        GraphDB<StatementResult> writeX = result(Statement.of("CREATE (:X {a: 1})"));
-        GraphDB<StatementResult> writeY = result(Statement.of("CREATE (:Y {b: 2, a: 1})"));
-
-        GraphDB<Integer> readYb = single(
-            Statement.of("MATCH (i:Y {b: 2}) RETURN i.a as a"),
-            field("a", Integer)
-        );
-
-        GraphDB<Node> readXbyYb = readYb.flatMap(yB ->
-            single(
-                new Statement("MATCH (i:X {a: $0}) RETURN i", NParamMap.of("0", value(yB))),
-                field("i", Node)))
-            .map(n -> n.node);
-
-        tx.submit(GraphDB.sequence(writeX, writeY)).get();
-
-        Node node = ro.submit(readXbyYb).get();
-
-        System.out.println(node);
-    }
 }
 
