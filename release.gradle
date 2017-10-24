@@ -1,0 +1,60 @@
+
+// TODO: explain
+def props = {
+    Properties properties = new Properties()
+    try {
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    } catch (Exception ex) {}
+    return properties }()
+
+def NAME = "neu"
+def GITHUB = "https://github.com/fredshonorio/neu"
+def GITHUB_GIT = "https://github.com/fredshonorio/neu.git"
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo" } }
+    developers {
+        developer {
+            id "fredshonorio"
+            name "Fred Honório"
+            email "fredshonorio@gmail.com" } } }
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'com.fredhonorio'
+            artifactId 'neu'
+            version getVersion()
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('name', NAME)
+                root.appendNode('url', GITHUB)
+                root.children().last() + pomConfig } } } }
+
+bintray {
+    user = props.getProperty("bintray.user")
+    key = props.getProperty("bintray.apikey")
+    publications = ['MyPublication']
+    pkg {
+        repo = 'maven'
+        name = NAME
+        userOrg = "fredhonorio-com"
+        licenses = ['Apache-2.0']
+        vcsUrl = GITHUB_GIT } }
