@@ -23,6 +23,11 @@ repositories {
     jcenter()
 }
 
+sourceSets {
+    main { java { srcDir 'src/main/' } }
+    test { java { srcDir 'src/test/' } }
+}
+
 dependencies {
     compile 'io.javaslang:javaslang:2.0.6',
             'org.neo4j.driver:neo4j-java-driver:1.4.0'
@@ -32,8 +37,6 @@ dependencies {
             'org.neo4j:neo4j:3.1.0',
             'io.javaslang:javaslang-test:2.0.6'
 }
-
-test { exclude "**" }
 
 tasks.withType(PublishToMavenRepository) {
     it.dependsOn clean
