@@ -218,7 +218,6 @@ public class Builder implements Fragments {
      *
      */
 
-    // TODO: add variants for multiple rels
     public Builder to() {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.empty(), empty())));
     }
@@ -227,12 +226,24 @@ public class Builder implements Fragments {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type), empty())));
     }
 
-    public Builder to(Var name, ToType toType) {
-        return to(name, toType.type());
+    public Builder to(Iterable<Type> types) {
+        return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.ofAll(types), empty())));
+    }
+
+    public Builder to(ToType type) {
+        return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type.type()), empty())));
     }
 
     public Builder to(Var name, Type type) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.of(type), empty())));
+    }
+
+    public Builder to(Var name, Iterable<Type> types) {
+        return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.ofAll(types), empty())));
+    }
+
+    public Builder to(Var name, ToType toType) {
+        return to(name, toType.type());
     }
 
     public Builder to(Var name) {
@@ -245,6 +256,10 @@ public class Builder implements Fragments {
 
     public Builder to(Var name, Type type, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.of(type), props)));
+    }
+
+    public Builder to(Var name, Iterable<Type> types, Properties props) {
+        return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.ofAll(types), props)));
     }
 
     public Builder to(Var name, ToType type, Properties props) {
@@ -261,6 +276,10 @@ public class Builder implements Fragments {
 
     public Builder to(Type type, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type), props)));
+    }
+
+    public Builder to(Iterable<Type> types, Properties props) {
+        return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.ofAll(types), props)));
     }
 
     public Builder to(ToType type, Properties props) {
