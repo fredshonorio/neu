@@ -2,7 +2,10 @@ package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.query.param.Fragment;
 import com.fredhonorio.neu.query.param.Fragments;
+import com.fredhonorio.neu.type.Parameter;
 import javaslang.collection.List;
+
+import java.util.function.Function;
 
 import static com.fredhonorio.neu.query.param.Fragment.param;
 import static com.fredhonorio.neu.query.param.Fragment.str;
@@ -51,6 +54,17 @@ public class Exp implements Fragments {
         return concat(this.fragments, " AND ", exp.fragments);
     }
 
+    public Exp eq(Exp exp) {
+        return concat(this.fragments, " = ", exp.fragments);
+    }
+
+    public Exp eq(Parameter param) {
+        return new Exp(
+            this.fragments
+                .append(new Fragment.Str("="))
+                .append(new Fragment.Param(param))
+        );
+    }
 
     public Exp sum(Exp a, Exp b) {
         return concat("(", a.fragments, "+", b.fragments, ")");
@@ -74,9 +88,16 @@ public class Exp implements Fragments {
         return concat("(", a.fragments, "+", List.of(param(value(b))), ")");
     }
 
-
     public static Exp of(String exp) {
         return new Exp(List.of(str(exp)));
+    }
+
+    public static Exp ID(Var v) {
+        return concat("ID(", v.fragments,")");
+    }
+
+    public static Exp type(Var v) {
+        return concat("type(", v.fragments,")");
     }
 
     public static Exp count(Exp exp) {
@@ -93,6 +114,37 @@ public class Exp implements Fragments {
 
     public static Exp countDistinct(Exp exp) {
         return concat("count(distinct", exp.fragments, ")");
+    }
+
+    public static Exp or(Exp...exp) {
+        return or(List.of(exp));
+    }
+
+    public static Exp or(List<Exp> exp) {
+        return booleanOp(exp, "OR");
+    }
+
+    public static Exp and(Exp...exp) {
+        return and(List.of(exp));
+    }
+
+    public static Exp and(List<Exp> exp) {
+        return booleanOp(exp, "AND");
+    }
+
+    private static Exp booleanOp(List<Exp> exps, String op) {
+        return exps.map(e -> e.fragments())
+            .intersperse(List.of(str(op)))
+            .flatMap(Function.identity())
+            .transform(fs -> new Exp(par(fs)));
+    }
+
+    public static Exp par(Exp e) {
+        return new Exp(par(e.fragments()));
+    }
+
+    private static List<Fragment> par(List<Fragment> frags) {
+        return frags.prepend(str("(")).append(str(")"));
     }
 
     @Override

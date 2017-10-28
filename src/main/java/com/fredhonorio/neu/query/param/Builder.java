@@ -151,6 +151,10 @@ public class Builder implements Fragments {
         return f(List.ofAll(fragments));
     }
 
+    public Builder inject(Fragment... fragments) {
+        return f(List.of(fragments));
+    }
+
     public Builder node(Fragment.Node node) {
         return new Builder(fragments().append(node));
     }
