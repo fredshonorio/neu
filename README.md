@@ -1,4 +1,6 @@
 # neu
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Download](https://api.bintray.com/packages/fredhonorio-com/maven/neu/images/download.svg)](https://bintray.com/fredhonorio-com/maven/neu/_latestVersion)
 [![Travis](https://travis-ci.org/fredshonorio/neu.svg?branch=master)](https://travis-ci.org/fredshonorio/neu)
 [![Ccodecov](https://codecov.io/gh/fredshonorio/neu/branch/master/graph/badge.svg)](https://codecov.io/gh/fredshonorio/neu)
 
