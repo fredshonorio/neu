@@ -82,6 +82,22 @@ public class Builder implements Fragments {
         return s("WHERE");
     }
 
+    public Builder Where(Exp e) {
+        return Where().s(e);
+    }
+
+    public Builder Set() {
+        return s("SET");
+    }
+
+    public Builder Set(Exp...exps) {
+        return Set().f(
+                List.of(exps)
+                    .map(exp -> exp.fragments)
+                    .intersperse(List.of(str(",")))
+                    .flatMap(Function.identity()));
+    }
+
     public Builder Delete() {
         return s("DELETE");
     }
