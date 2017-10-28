@@ -4,14 +4,18 @@ plugins {
         id "maven"
         id "maven-publish"
         id "idea"
+        id 'jacoco'
         id "com.jfrog.bintray" version "1.7.3"
 }
 
 sourceCompatibility = targetCompatibility = 1.8
-version = '0.2.0'
+version = '0.2.1'
 project.group = "com.fredhonorio"
 
 apply from: 'release.gradle'
+
+jacocoTestReport { reports { xml.enabled true } }
+check.dependsOn jacocoTestReport
 
 jar {
     manifest { attributes 'Implementation-Title': 'neu', 'Implementation-Version': version }

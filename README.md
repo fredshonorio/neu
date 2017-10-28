@@ -1,5 +1,6 @@
 # neu
 [![Travis](https://travis-ci.org/fredshonorio/neu.svg?branch=master)](https://travis-ci.org/fredshonorio/neu)
+[![Ccodecov](https://codecov.io/gh/fredshonorio/neu/branch/master/graph/badge.svg)](https://codecov.io/gh/fredshonorio/neu)
 
 Well-typed wrapper over the official [neo4j java driver](https://github.com/neo4j/neo4j-java-driver).
 
