@@ -137,17 +137,17 @@ public interface Fragment {
         String nameStr = ref.map(r -> r.value).getOrElse("");
 
         // @formatter:off
-            if ((ref.isDefined() || typeOrLabels.nonEmpty()) && properties.nonEmpty()) { // 111
-                                                                                         // 101
-                return concat(nameStr, typeOrLabelsStr, " ", propStr);                   // 011
-            } else if (properties.isEmpty()) {                                           // 110
-                                                                                         // 100
-                                                                                         // 010
-                return concat(nameStr, typeOrLabelsStr);                                 // 000
-            } else {                                                                     // 001
-                return propStr;
-            }
-            // @formatter:on
+        if ((ref.isDefined() || typeOrLabels.nonEmpty()) && properties.nonEmpty()) { // 111
+                                                                                     // 101
+            return concat(nameStr, typeOrLabelsStr, " ", propStr);                   // 011
+        } else if (properties.isEmpty()) {                                           // 110
+                                                                                     // 100
+                                                                                     // 010
+            return concat(nameStr, typeOrLabelsStr);                                 // 000
+        } else {                                                                     // 001
+            return propStr;
+        }
+        // @formatter:on
     }
 
     public static Str str(String s) {

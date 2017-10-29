@@ -57,6 +57,14 @@ public class Builder implements Fragments {
         return s("MATCH");
     }
 
+    public Builder Match(Path...paths) {
+        return s("MATCH").f(
+            List.of(paths)
+                .map(p -> p.fragments())
+                .intersperse(List.of(str(",")))
+                .flatMap(Function.identity()));
+    }
+
     public Builder With() {
         return s("WITH");
     }
@@ -155,7 +163,7 @@ public class Builder implements Fragments {
         return f(List.of(fragments));
     }
 
-    public Builder node(Fragment.Node node) {
+    private Builder node(Fragment.Node node) {
         return new Builder(fragments().append(node));
     }
 
