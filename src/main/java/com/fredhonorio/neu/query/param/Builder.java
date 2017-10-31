@@ -321,7 +321,7 @@ public class Builder implements Fragments {
         List<Tuple2<String, TreeMap<String, Parameter>>> parts = fragments.zip(indices)
             .map(x -> fragment(x._1, x._2));
 
-        String query = parts.map(Tuple2::_1).transform(Strings.mkString(" "));
+        String query = parts.map(Tuple2::_1).transform(Strings::concat).trim(); // TODO: trim is ugly
         TreeMap<String, Parameter> params = parts.map(Tuple2::_2).flatMap(javaslang.Value::toList).transform(TreeMap::ofEntries);
 
         return new Statement(query, new NParamMap(params));
@@ -330,10 +330,14 @@ public class Builder implements Fragments {
     private static Tuple2<String, TreeMap<String, Parameter>> fragment(Fragment f, int idx) {
         TreeMap<String, Parameter> empty = TreeMap.empty();
         return f.match(
-            str -> Tuple.of(str.s, empty),
+            str -> Tuple.of(
+                str.spaceAfter
+                    ? concat(str.s, " ")
+                    : str.s,
+                empty),
             node -> nodeFragment(node, idx),
             rel -> relFragment(rel, idx),
-            param -> Tuple.of("$_" + idx, TreeMap.of("_" + idx, param.parameter))
+            param -> Tuple.of(concat("$_", Integer.toString(idx), " "), TreeMap.of("_" + idx, param.parameter))
         );
     }
 
@@ -349,7 +353,7 @@ public class Builder implements Fragments {
             );
 
         return Tuple.of(
-            f.pattern(propName),
+            concat(f.pattern(propName), " "),
             TreeMap.ofEntries(parameterValues)
         );
     }
@@ -367,7 +371,7 @@ public class Builder implements Fragments {
             );
 
         return Tuple.of(
-            f.pattern(propName),
+            concat(f.pattern(propName), " "),
             TreeMap.ofEntries(parameterValues)
         );
     }

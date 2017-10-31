@@ -25,9 +25,16 @@ public interface Fragment {
 
     public static class Str implements Fragment {
         public final String s;
+        public final boolean spaceAfter;
 
         public Str(String s) {
             this.s = s;
+            this.spaceAfter = true;
+        }
+
+        public Str(String s, boolean spaceAfter) {
+            this.s = s;
+            this.spaceAfter = spaceAfter;
         }
 
         @Override

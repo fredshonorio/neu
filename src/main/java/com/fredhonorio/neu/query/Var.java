@@ -1,5 +1,6 @@
 package com.fredhonorio.neu.query;
 
+import com.fredhonorio.neu.query.param.Fragment;
 import javaslang.collection.List;
 
 import static com.fredhonorio.neu.query.param.Fragment.str;
@@ -24,6 +25,13 @@ public class Var extends Exp {
     }
 
     public Exp dot(Field f) {
-        return concat(this.fragments, ".", List.of(str(f.fieldName())));
+        return new Exp(
+            List.<Fragment>of(
+                new Fragment.Str(value, false),
+                new Fragment.Str(".", false),
+                str(f.fieldName()))
+        );
+    }
+
     }
 }
