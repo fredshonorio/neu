@@ -1,5 +1,6 @@
 package com.fredhonorio.neu.query.param;
 
+import com.fredhonorio.neu.query.ToLabel;
 import com.fredhonorio.neu.query.Var;
 import com.fredhonorio.neu.type.Label;
 import com.fredhonorio.neu.type.Properties;
@@ -28,6 +29,10 @@ public class Paths {
         return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
     }
 
+    public static Path node(Var name, ToLabel label) {
+        return node(fNode(Option.of(name), LinkedHashSet.of(label.label()), empty()));
+    }
+
     public static Path node(Var name, Iterable<Label> labels) {
         return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
     }
@@ -38,6 +43,10 @@ public class Paths {
 
     public static Path node(Var name, Label label, Properties properties) {
         return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
+    }
+
+    public static Path node(Var name, ToLabel label, Properties properties) {
+        return node(fNode(Option.of(name), LinkedHashSet.of(label.label()), properties));
     }
 
     public static Path node(Var name, Iterable<Label> labels, Properties properties) {
@@ -52,6 +61,10 @@ public class Paths {
         return node(fNode(Option.none(), LinkedHashSet.of(label), empty()));
     }
 
+    public static Path node(ToLabel label) {
+        return node(fNode(Option.none(), LinkedHashSet.of(label.label()), empty()));
+    }
+
     public static Path node(Iterable<Label> labels) {
         return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), empty()));
     }
@@ -62,6 +75,10 @@ public class Paths {
 
     public static Path node(Label label, Properties properties) {
         return node(fNode(Option.none(), LinkedHashSet.of(label), properties));
+    }
+
+    public static Path node(ToLabel label, Properties properties) {
+        return node(fNode(Option.none(), LinkedHashSet.of(label.label()), properties));
     }
 
     public static Path node(Iterable<Label> labels, Properties properties) {
