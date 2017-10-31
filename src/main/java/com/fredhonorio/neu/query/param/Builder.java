@@ -163,63 +163,77 @@ public class Builder implements Fragments {
         return f(List.of(fragments));
     }
 
+    @Deprecated
     private Builder node(Fragment.Node node) {
         return new Builder(fragments().append(node));
     }
 
+    @Deprecated
     public Builder node() {
         return node(fNode(none(), LinkedHashSet.empty(), empty()));
     }
 
-    // with var
+    @Deprecated
     public Builder node(Var name) {
         return node(fNode(Option.of(name), LinkedHashSet.empty(), empty()));
     }
 
+    @Deprecated
     public Builder node(Var name, Label label) {
         return node(fNode(Option.of(name), LinkedHashSet.of(label), empty()));
     }
 
+    @Deprecated
     public Builder node(Var name, Iterable<Label> labels) {
         return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), empty()));
     }
 
+    @Deprecated
     public Builder node(Var name, Properties properties) {
         return node(fNode(Option.of(name), LinkedHashSet.empty(), properties));
     }
 
+    @Deprecated
     public Builder node(Var name, Label label, Properties properties) {
         return node(fNode(Option.of(name), LinkedHashSet.of(label), properties));
     }
 
+    @Deprecated
     public Builder node(Var name, Iterable<Label> labels, Properties properties) {
         return node(fNode(Option.of(name), LinkedHashSet.ofAll(labels), properties));
     }
 
+    @Deprecated
     public Builder node(Var name, com.fredhonorio.neu.type.Node node) {
         return node(fNode(Option.of(name), node.labels, node.properties));
     }
 
+    @Deprecated
     public Builder node(Label label) {
         return node(fNode(Option.none(), LinkedHashSet.of(label), empty()));
     }
 
+    @Deprecated
     public Builder node(Iterable<Label> labels) {
         return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), empty()));
     }
 
+    @Deprecated
     public Builder node(Properties properties) {
         return node(fNode(Option.none(), LinkedHashSet.empty(), properties));
     }
 
+    @Deprecated
     public Builder node(Label label, Properties properties) {
         return node(fNode(Option.none(), LinkedHashSet.of(label), properties));
     }
 
+    @Deprecated
     public Builder node(Iterable<Label> labels, Properties properties) {
         return node(fNode(Option.none(), LinkedHashSet.ofAll(labels), properties));
     }
 
+    @Deprecated
     public Builder node(com.fredhonorio.neu.type.Node node) {
         return node(fNode(Option.none(), node.labels, node.properties));
     }
@@ -230,74 +244,92 @@ public class Builder implements Fragments {
      *
      */
 
+    @Deprecated
     public Builder to() {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.empty(), empty())));
     }
 
+    @Deprecated
     public Builder to(Type type) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type), empty())));
     }
 
+    @Deprecated
     public Builder to(Iterable<Type> types) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.ofAll(types), empty())));
     }
 
+    @Deprecated
     public Builder to(ToType type) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type.type()), empty())));
     }
 
+    @Deprecated
     public Builder to(Var name, Type type) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.of(type), empty())));
     }
 
+    @Deprecated
     public Builder to(Var name, Iterable<Type> types) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.ofAll(types), empty())));
     }
 
+    @Deprecated
     public Builder to(Var name, ToType toType) {
         return to(name, toType.type());
     }
 
+    @Deprecated
     public Builder to(Var name) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.empty(), empty())));
     }
 
+    @Deprecated
     public Builder to(Var name, Properties properties) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.empty(), properties)));
     }
 
+    @Deprecated
     public Builder to(Var name, Type type, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.of(type), props)));
     }
 
+    @Deprecated
     public Builder to(Var name, Iterable<Type> types, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.ofAll(types), props)));
     }
 
+    @Deprecated
     public Builder to(Var name, ToType type, Properties props) {
         return to(name, type.type(), props);
     }
 
+    @Deprecated
     public Builder to(Var name, Relationship relationship) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, some(name), List.of(relationship.type), relationship.properties)));
     }
 
+    @Deprecated
     public Builder to(Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.empty(), props)));
     }
 
+    @Deprecated
     public Builder to(Type type, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(type), props)));
     }
 
+    @Deprecated
     public Builder to(Iterable<Type> types, Properties props) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.ofAll(types), props)));
     }
 
+    @Deprecated
     public Builder to(ToType type, Properties props) {
         return to(type.type(), props);
     }
 
+    @Deprecated
     public Builder to(Relationship relationship) {
         return new Builder(fragments().append(new Fragment.Rel(Fragment.Dir.TO, none(), List.of(relationship.type), relationship.properties)));
     }
