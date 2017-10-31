@@ -33,10 +33,9 @@ public class Exp implements Fragments {
 
     public final List<Fragment> fragments;
 
-    Exp(List<Fragment> fragments) {
+    public Exp(List<Fragment> fragments) {
         this.fragments = fragments;
     }
-
 
     public Exp as(Var var) {
         return concat(this.fragments, " as ", var.fragments);
@@ -118,6 +117,10 @@ public class Exp implements Fragments {
 
     public static Exp or(Exp...exp) {
         return or(List.of(exp));
+    }
+
+    public static Exp not(Exp exp) {
+        return new Exp(exp.fragments.prepend(str("NOT")));
     }
 
     public static Exp or(List<Exp> exp) {

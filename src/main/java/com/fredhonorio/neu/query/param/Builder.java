@@ -36,6 +36,20 @@ public class Builder implements Fragments {
         return new Builder(List.empty());
     }
 
+    private static List<Fragment> commaSeparated(Path... paths) {
+        return List.of(paths)
+            .map(p -> p.fragments())
+            .intersperse(List.of(str(",")))
+            .flatMap(Function.identity());
+    }
+
+    private static List<Fragment> commaSeparated(Exp... exps) {
+        return List.of(exps)
+            .map(p -> p.fragments())
+            .intersperse(List.of(str(",")))
+            .flatMap(Function.identity());
+    }
+
     @Override
     public List<Fragment> fragments() {
         return fragments;
@@ -58,11 +72,15 @@ public class Builder implements Fragments {
     }
 
     public Builder Match(Path...paths) {
-        return s("MATCH").f(
-            List.of(paths)
-                .map(p -> p.fragments())
-                .intersperse(List.of(str(",")))
-                .flatMap(Function.identity()));
+        return s("MATCH").f(commaSeparated(paths));
+    }
+
+    public Builder OptionalMatch() {
+        return s("OPTIONAL MATCH");
+    }
+
+    public Builder OptionalMatch(Path...paths) {
+        return s("OPTIONAL MATCH").f(commaSeparated(paths));
     }
 
     public Builder With() {
@@ -71,19 +89,23 @@ public class Builder implements Fragments {
 
     @SafeVarargs
     public final <T extends Exp> Builder With(T... parts) {
-        return With().f(
-            List.of(parts)
-                .map(exp -> exp.fragments)
-                .intersperse(List.of(str(",")))
-                .flatMap(Function.identity()));
+        return With().f(commaSeparated(parts));
     }
 
     public Builder Create() {
         return s("CREATE");
     }
 
+    public Builder Create(Path... paths) {
+        return s("CREATE").f(commaSeparated(paths));
+    }
+
     public Builder Merge() {
         return s("MERGE");
+    }
+
+    public Builder Merge(Path path) {
+        return s("MERGE").inject(path.fragments());
     }
 
     public Builder Where() {
@@ -99,15 +121,15 @@ public class Builder implements Fragments {
     }
 
     public Builder Set(Exp...exps) {
-        return Set().f(
-                List.of(exps)
-                    .map(exp -> exp.fragments)
-                    .intersperse(List.of(str(",")))
-                    .flatMap(Function.identity()));
+        return Set().f(commaSeparated(exps));
     }
 
     public Builder Delete() {
         return s("DELETE");
+    }
+
+    public Builder Delete(Var...vars) {
+        return s("DELETE").f(commaSeparated(vars));
     }
 
     public Builder Return(Exp exp) {

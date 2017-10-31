@@ -33,5 +33,7 @@ public class Var extends Exp {
         );
     }
 
+    public Exp dot(ToField f) {
+        return dot(f.field());
     }
 }
