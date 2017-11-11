@@ -1,5 +1,6 @@
 package com.fredhonorio.neu.decoder;
 
+import com.fredhonorio.neu.query.Ref;
 import com.fredhonorio.neu.type.*;
 import com.fredhonorio.neu.util.Strings;
 import javaslang.*;
@@ -281,6 +282,18 @@ public interface ResultDecoder<T> {
     }
 
     /**
+     * {@link #field(java.lang.String, ResultDecoder)}
+     *
+     * @param key
+     * @param inner
+     * @param <T>
+     * @return
+     */
+    static <T> ResultDecoder<T> field(Ref key, ResultDecoder<T> inner) {
+        return field(key.string(), inner);
+    }
+
+    /**
      * Decodes a map, reads a field and applies the given decoder, wrapped in an {@link Option}. If the value is not
      * a map, or the inner decoder fails, then the resulting decoder fails. If the key does not exist, the decoder
      * succeeds with a {@link Option.None}.
@@ -296,6 +309,17 @@ public interface ResultDecoder<T> {
                 .map(e -> inner.decode(e).map(Option::some))
                 .getOrElse(Either.right(Option.none())))
             .mapLeft(err -> "field '" + key + "': " + err);
+    }
+
+    /**
+     * {@link #optionalField(java.lang.String, ResultDecoder)}
+     * @param key
+     * @param inner
+     * @param <T>
+     * @return
+     */
+    static <T> ResultDecoder<Option<T>> optionalField(Ref key, ResultDecoder<T> inner) {
+        return optionalField(key.string(), inner);
     }
 
     /**
