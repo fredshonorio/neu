@@ -433,7 +433,7 @@ public class Exp implements Fragments {
     private Exp infix(String op, List<Fragment> frags) {
         return new Exp(
             this.fragments
-                .append(new Fragment.Str(Strings.concat(" ", op, " ")))
+                .append(str(op))
                 .appendAll(frags)
         );
     }
