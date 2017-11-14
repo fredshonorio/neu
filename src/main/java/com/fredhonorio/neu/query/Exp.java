@@ -2,6 +2,7 @@ package com.fredhonorio.neu.query;
 
 import com.fredhonorio.neu.query.param.Fragment;
 import com.fredhonorio.neu.query.param.Fragments;
+import com.fredhonorio.neu.type.NParamList;
 import com.fredhonorio.neu.type.Parameter;
 import com.fredhonorio.neu.util.Strings;
 import javaslang.collection.List;
@@ -13,9 +14,6 @@ import static com.fredhonorio.neu.query.param.Fragment.param;
 import static com.fredhonorio.neu.query.param.Fragment.str;
 import static com.fredhonorio.neu.type.Value.value;
 
-// prefix, infix versions of boolean operations
-// prefix binary math
-// infix comparison
 public class Exp implements Fragments {
 
     public final List<Fragment> fragments;
@@ -31,36 +29,64 @@ public class Exp implements Fragments {
 
     // INFIX - BOOLEAN
     public Exp or(Exp exp) {
-        return infix("OR", exp.fragments);
+        return infix("OR", exp);
     }
 
     public Exp xor(Exp exp) {
-        return infix("XOR", exp.fragments);
+        return infix("XOR", exp);
     }
 
     public Exp and(Exp exp) {
-        return infix("AND", exp.fragments);
+        return infix("AND", exp);
     }
 
     // INFIX - COMPARISON
     public Exp eq(Exp exp) {
-        return infix("=", exp.fragments);
+        return infix("=", exp);
     }
 
     public Exp eq(Parameter param) {
-        return infix("=", param(param));
+        return infix("=", param);
     }
 
-    public Exp contains(String value) {
-        return infix("CONTAINS", param(value(value)));
+    public Exp ineq(Exp exp) {
+        return infix("<>", exp);
     }
 
-    public Exp startsWith(String value) {
-        return infix("STARTS WITH", param(value(value)));
+    public Exp ineq(Parameter param) {
+        return infix("<>", param);
     }
 
-    public Exp endsWith(String value) {
-        return infix("ENDS WITH", param(value(value)));
+    public Exp lt(Exp exp) {
+        return infix("<", exp);
+    }
+
+    public Exp lt(Parameter param) {
+        return infix("<", param);
+    }
+
+    public Exp gt(Exp exp) {
+        return infix(">", exp);
+    }
+
+    public Exp gt(Parameter param) {
+        return infix(">", param);
+    }
+
+    public Exp lte(Exp exp) {
+        return infix("<=", exp);
+    }
+
+    public Exp lte(Parameter param) {
+        return infix("<=", param);
+    }
+
+    public Exp gte(Exp exp) {
+        return infix(">=", exp);
+    }
+
+    public Exp gte(Parameter param) {
+        return infix(">=", param);
     }
 
     public Exp isNull() {
@@ -71,14 +97,68 @@ public class Exp implements Fragments {
         return postfix("IS NOT NULL");
     }
 
+    public Exp startsWith(String value) {
+        return infix("STARTS WITH", value(value));
+    }
+
+    public Exp endsWith(String value) {
+        return infix("ENDS WITH", value(value));
+    }
+
+    public Exp contains(String value) {
+        return infix("CONTAINS", value(value));
+    }
+
+    // INFIX - LIST
+    public Exp in(NParamList list) {
+        return infix("IN", list);
+    }
+
+    public Exp in(Exp list) {
+        return infix("IN", list);
+    }
+
+    public Exp index(Exp idx) {
+        return new Exp(
+            this.fragments
+                .append(str("["))
+                .appendAll(idx.fragments())
+                .append(str("]"))
+        );
+    }
+
+    public Exp index(long i) {
+        return index(new Exp(List.of(param(value(i)))));
+    }
 
     // INFIX - OTHER
     public Exp as(Var var) {
         return infix("as", var.fragments);
     }
 
+    // string/list concatenation
+    public Exp plus(Parameter p) {
+        return infix("+", p);
+    }
+
+    // string/list concatenation (works for numbers as well, but static methods are prefered
+    public Exp plus(Exp e) {
+        return infix("+", e);
+    }
+
+    public Exp regexMatch(Exp e) {
+        return infix("=~", e);
+    }
+
+    public Exp regexMatch(String regex) {
+        return infix("=~", value(regex));
+    }
 
     // PREFIX - FUNCTIONS
+    public static Exp distinct(Exp exp) {
+        return concat("distinct", exp.fragments, "");
+    }
+
     public static Ref ID(Var v) {
         return func("ID", v);
     }
@@ -119,28 +199,134 @@ public class Exp implements Fragments {
         return new Ref(Strings.concat("count(distinct ", r.string(), ")"));
     }
 
-
     // PREFIX - MATH
+    //                SUM
     public static Exp sum(Exp a, Exp b) {
-        return concat("(", a.fragments, "+", b.fragments, ")");
+        return infixPar("+", a, b);
     }
 
     public static Exp sum(long a, Exp b) {
-        return concat("(", List.of(param(value(a))), "+", b.fragments, ")");
+        return infixPar("+", a, b);
     }
 
     public static Exp sum(Exp a, long b) {
-        return concat("(", a.fragments, "+", List.of(param(value(b))), ")");
+        return infixPar("+", a, b);
     }
 
     public static Exp sum(double a, Exp b) {
-        return concat("(", List.of(param(value(a))), "+", b.fragments, ")");
+        return infixPar("+", a, b);
     }
 
     public static Exp sum(Exp a, double b) {
-        return concat("(", a.fragments, "+", List.of(param(value(b))), ")");
+        return infixPar("+", a, b);
     }
 
+    //                SUB
+    public static Exp sub(Exp a, Exp b) {
+        return infixPar("-", a, b);
+    }
+
+    public static Exp sub(long a, Exp b) {
+        return infixPar("-", a, b);
+    }
+
+    public static Exp sub(Exp a, long b) {
+        return infixPar("-", a, b);
+    }
+
+    public static Exp sub(double a, Exp b) {
+        return infixPar("-", a, b);
+    }
+
+    public static Exp sub(Exp a, double b) {
+        return infixPar("-", a, b);
+    }
+
+
+    //                MUL
+    public static Exp mul(Exp a, Exp b) {
+        return infixPar("*", a, b);
+    }
+
+    public static Exp mul(long a, Exp b) {
+        return infixPar("*", a, b);
+    }
+
+    public static Exp mul(Exp a, long b) {
+        return infixPar("*", a, b);
+    }
+
+    public static Exp mul(double a, Exp b) {
+        return infixPar("*", a, b);
+    }
+
+    public static Exp mul(Exp a, double b) {
+        return infixPar("*", a, b);
+    }
+
+
+    //                DIV
+    public static Exp div(Exp a, Exp b) {
+        return infixPar("/", a, b);
+    }
+
+    public static Exp div(long a, Exp b) {
+        return infixPar("/", a, b);
+    }
+
+    public static Exp div(Exp a, long b) {
+        return infixPar("/", a, b);
+    }
+
+    public static Exp div(double a, Exp b) {
+        return infixPar("/", a, b);
+    }
+
+    public static Exp div(Exp a, double b) {
+        return infixPar("/", a, b);
+    }
+
+    //                MOD
+    public static Exp mod(Exp a, Exp b) {
+        return infixPar("%", a, b);
+    }
+
+    public static Exp mod(long a, Exp b) {
+        return infixPar("%", a, b);
+    }
+
+    public static Exp mod(Exp a, long b) {
+        return infixPar("%", a, b);
+    }
+
+    public static Exp mod(double a, Exp b) {
+        return infixPar("%", a, b);
+    }
+
+    public static Exp mod(Exp a, double b) {
+        return infixPar("%", a, b);
+    }
+
+    //                POW
+    public static Exp pow(Exp a, Exp b) {
+        return infixPar("^", a, b);
+    }
+
+    public static Exp pow(long a, Exp b) {
+        return infixPar("^", a, b);
+    }
+
+    public static Exp pow(Exp a, long b) {
+        return infixPar("^", a, b);
+    }
+
+    public static Exp pow(double a, Exp b) {
+        return infixPar("^", a, b);
+    }
+
+    public static Exp pow(Exp a, double b) {
+        return infixPar("^", a, b);
+    }
 
     // PREFIX - BOOLEAN
     public static Exp or(Exp... exp) {
@@ -180,8 +366,33 @@ public class Exp implements Fragments {
         return new Exp(par(e.fragments()));
     }
 
+    // TODO: unary negate
 
     // PRIVATE
+    private static Exp infixPar(String op, List<Fragment> a, List<Fragment> b) {
+        return new Exp(par(a.append(str(op)).appendAll(b)));
+    }
+
+    private static Exp infixPar(String op, Exp a, Exp b) {
+        return infixPar(op, a.fragments(), b.fragments());
+    }
+
+    private static Exp infixPar(String op, long a, Exp b) {
+        return infixPar(op, List.of(param(value(a))), b.fragments());
+    }
+
+    private static Exp infixPar(String op, Exp a, long b) {
+        return infixPar(op, a.fragments(), List.of(param(value(b))));
+    }
+
+    private static Exp infixPar(String op, double a, Exp b) {
+        return infixPar(op, List.of(param(value(a))), b.fragments());
+    }
+
+    private static Exp infixPar(String op, Exp a, double b) {
+        return infixPar(op, a.fragments(), List.of(param(value(b))));
+    }
+
     private static List<Fragment> par(List<Fragment> frags) {
         return frags.prepend(str("(")).append(str(")"));
     }
@@ -209,6 +420,14 @@ public class Exp implements Fragments {
 
     private Exp infix(String op, Fragment frag) {
         return infix(op, List.of(frag));
+    }
+
+    private Exp infix(String op, Parameter param) {
+        return infix(op, List.of(new Fragment.Param(param)));
+    }
+
+    private Exp infix(String op, Exp exp) {
+        return infix(op, exp.fragments());
     }
 
     private Exp infix(String op, List<Fragment> frags) {
