@@ -356,7 +356,6 @@ public class Exp implements Fragments {
             .transform(fs -> new Exp(par(fs)));
     }
 
-
     // UTIL
     public static Exp of(String exp) {
         return new Exp(List.of(str(exp)));
@@ -364,6 +363,16 @@ public class Exp implements Fragments {
 
     public static Exp par(Exp e) {
         return new Exp(par(e.fragments()));
+    }
+
+    // TODO: it's weird to represent '*' with a Ref, we might need a better solution so that
+    // prefix functions don't produce spaces between the parens and the argument
+    public static Ref asterisk() {
+        return all();
+    }
+
+    public static Ref all() {
+        return new Ref("*");
     }
 
     // TODO: unary negate

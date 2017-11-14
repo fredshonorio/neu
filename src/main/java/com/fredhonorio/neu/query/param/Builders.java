@@ -7,6 +7,10 @@ public abstract class Builders {
         return Builder.builder().Match(paths);
     }
 
+    public static Builder OptionalMatch(Path... paths) {
+        return Builder.builder().OptionalMatch(paths);
+    }
+
     public Builder Return(Exp... exps) {
         return Builder.builder().Return(exps);
     }

@@ -67,6 +67,7 @@ public class Builder implements Fragments {
         return new Builder(fragments().appendAll(s.fragments));
     }
 
+    @Deprecated
     public Builder Match() {
         return s("MATCH");
     }
@@ -75,6 +76,7 @@ public class Builder implements Fragments {
         return s("MATCH").f(commaSeparated(paths));
     }
 
+    @Deprecated
     public Builder OptionalMatch() {
         return s("OPTIONAL MATCH");
     }
@@ -83,6 +85,7 @@ public class Builder implements Fragments {
         return s("OPTIONAL MATCH").f(commaSeparated(paths));
     }
 
+    @Deprecated
     public Builder With() {
         return s("WITH");
     }
