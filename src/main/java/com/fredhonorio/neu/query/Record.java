@@ -35,6 +35,6 @@ public class Record {
     }
 
     public NResultMap asResult() {
-        return new NResultMap(TreeMap.ofEntries(items.toList()));
+        return new NResultMap(LinkedHashMap.ofEntries(items.toList()));
     }
 }

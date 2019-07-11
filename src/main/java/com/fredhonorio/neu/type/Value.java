@@ -1,8 +1,8 @@
 package com.fredhonorio.neu.type;
 
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.List;
 import javaslang.collection.Map;
-import javaslang.collection.TreeMap;
 
 public interface Value {
     // http://neo4j.com/docs/developer-manual/current/drivers/cypher-values/
@@ -111,13 +111,13 @@ public interface Value {
 
     // param map
     public static NParamMap paramMap(String k, Parameter v) {
-        return new NParamMap(TreeMap.of(k, v));
+        return new NParamMap(LinkedHashMap.of(k, v));
     }
 
     // TODO: String -> X -> NParamMap, for every primitive X
 
     public static NParamMap paramMap(Map<String, Parameter> map) {
-        return new NParamMap(Util.toTreeMap(map));
+        return new NParamMap(Util.toLinkedHashMap(map));
     }
 
     // TODO: NParamMap with java util map

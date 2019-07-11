@@ -1,13 +1,13 @@
 package com.fredhonorio.neu.type;
 
 import com.fredhonorio.neu.util.Strings;
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.Map;
 import javaslang.collection.Seq;
-import javaslang.collection.TreeMap;
 
 public class Util {
 
-    public static String printMap(TreeMap<String, ? extends Value> m) {
+    public static String printMap(Map<String, ? extends Value> m) {
         return m
             .map(t -> t._1 + "=" + t._2.toString())
             .toList()
@@ -18,9 +18,9 @@ public class Util {
         return m.toList().map(Value::toString).transform(Strings.mkString(","));
     }
 
-    public static <T> TreeMap<String, T> toTreeMap(Map<String, T> map) {
-        return map instanceof TreeMap
-            ? (TreeMap<String, T>) map
-            : TreeMap.ofEntries(map.toList());
+    public static <T> LinkedHashMap<String, T> toLinkedHashMap(Map<String, T> map) {
+        return map instanceof LinkedHashMap
+            ? (LinkedHashMap<String, T>) map
+            : LinkedHashMap.ofEntries(map.toList());
     }
 }

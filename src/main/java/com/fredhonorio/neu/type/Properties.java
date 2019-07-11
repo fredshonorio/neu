@@ -1,20 +1,21 @@
 package com.fredhonorio.neu.type;
 
 import com.fredhonorio.neu.util.Strings;
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
 import java.util.function.Function;
 
 public class Properties {
-    private final TreeMap<String, Property> properties;
+    private final LinkedHashMap<String, Property> properties;
 
     // TODO: sanitize key names
-    public Properties(TreeMap<String, Property> properties) {
+    public Properties(LinkedHashMap<String, Property> properties) {
         this.properties = properties;
     }
 
-    public TreeMap<String, Property> asMap() {
+    public LinkedHashMap<String, Property> asMap() {
         return properties;
     }
 
@@ -47,27 +48,27 @@ public class Properties {
     }
 
     public static Properties of(String k, Property v) {
-        return new Properties(TreeMap.of(k, v));
+        return new Properties(LinkedHashMap.of(k, v));
     }
 
     public static Properties of(String k, boolean v) {
-        return new Properties(TreeMap.of(k, Value.nBoolean(v)));
+        return new Properties(LinkedHashMap.of(k, Value.nBoolean(v)));
     }
 
     public static Properties of(String k, String v) {
-        return new Properties(TreeMap.of(k, Value.nString(v)));
+        return new Properties(LinkedHashMap.of(k, Value.nString(v)));
     }
 
     public static Properties of(String k, double v) {
-        return new Properties(TreeMap.of(k, Value.nFloat(v)));
+        return new Properties(LinkedHashMap.of(k, Value.nFloat(v)));
     }
 
     public static Properties of(String k, long v) {
-        return new Properties(TreeMap.of(k, Value.nInteger(v)));
+        return new Properties(LinkedHashMap.of(k, Value.nInteger(v)));
     }
 
     public static Properties empty() {
-        return new Properties(TreeMap.empty());
+        return new Properties(LinkedHashMap.empty());
     }
 
     public boolean isEmpty() {

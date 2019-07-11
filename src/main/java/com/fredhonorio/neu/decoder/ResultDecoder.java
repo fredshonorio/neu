@@ -380,6 +380,16 @@ public interface ResultDecoder<T> {
         return index(index).andThen(value -> result(dec.decode(value)));
     }
 
+    static <T> ResultDecoder<T> rowPos(int index, ResultDecoder<T> dec) {
+        return Map
+            .andThen(m -> m.value.drop(index).headOption()
+                .map(pair -> success(pair._2))
+                .getOrElse(() -> failure("Can't get value at position #" + index + ", row size" + m.value.size())))
+            .map(item -> dec.decode(item).mapLeft(err -> "Row position #" + index + ": " + err))
+            .andThen(ResultDecoder::result)
+            ;
+    }
+
     /**
      * Traverses an object tree using the given list of keys, and finally applies a decoder to the final value.
      *
@@ -623,6 +633,34 @@ public interface ResultDecoder<T> {
      */
     static <A, B, C, D, E, F, G, H, TT> ResultDecoder<TT> map8(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, ResultDecoder<G> g, ResultDecoder<H> h, Function8<A, B, C, D, E, F, G, H, TT> mapper) {
         return a.andThen(_a -> b.andThen(_b -> c.andThen(_c -> d.andThen(_d -> e.andThen(_e -> f.andThen(_f -> g.andThen(_g -> h.map(_h -> mapper.apply(_a, _b, _c, _d, _e, _f, _g, _h)))))))));
+    }
+
+    static <A, B, TT> ResultDecoder<TT> row2(ResultDecoder<A> a, ResultDecoder<B> b, Function2<A, B, TT> mapper) {
+        return map2(rowPos(0, a), rowPos(1, b), mapper);
+    }
+
+    static <A, B, C, TT> ResultDecoder<TT> row3(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, Function3<A, B, C, TT> mapper) {
+        return map3(rowPos(0, a), rowPos(1, b), rowPos(2, c), mapper);
+    }
+
+    static <A, B, C, D, TT> ResultDecoder<TT> row4(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, Function4<A, B, C, D, TT> mapper) {
+        return map4(rowPos(0, a), rowPos(1, b), rowPos(2, c), rowPos(3, d), mapper);
+    }
+
+    static <A, B, C, D, E, TT> ResultDecoder<TT> row5(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, Function5<A, B, C, D, E, TT> mapper) {
+        return map5(rowPos(0, a), rowPos(1, b), rowPos(2, c), rowPos(3, d), rowPos(4, e), mapper);
+    }
+
+    static <A, B, C, D, E, F, TT> ResultDecoder<TT> row6(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, Function6<A, B, C, D, E, F, TT> mapper) {
+        return map6(rowPos(0, a), rowPos(1, b), rowPos(2, c), rowPos(3, d), rowPos(4, e), rowPos(5, f), mapper);
+    }
+
+    static <A, B, C, D, E, F, G, TT> ResultDecoder<TT> row7(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, ResultDecoder<G> g, Function7<A, B, C, D, E, F, G, TT> mapper) {
+        return map7(rowPos(0, a), rowPos(1, b), rowPos(2, c), rowPos(3, d), rowPos(4, e), rowPos(5, f), rowPos(6, g), mapper);
+    }
+
+    static <A, B, C, D, E, F, G, H, TT> ResultDecoder<TT> row8(ResultDecoder<A> a, ResultDecoder<B> b, ResultDecoder<C> c, ResultDecoder<D> d, ResultDecoder<E> e, ResultDecoder<F> f, ResultDecoder<G> g, ResultDecoder<H> h, Function8<A, B, C, D, E, F, G, H, TT> mapper) {
+        return map8(rowPos(0, a), rowPos(1, b), rowPos(2, c), rowPos(3, d), rowPos(4, e), rowPos(5, f), rowPos(6, g), rowPos(7, h), mapper);
     }
 
     // private

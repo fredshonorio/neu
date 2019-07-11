@@ -8,6 +8,7 @@ import com.fredhonorio.neu.type.*;
 import com.fredhonorio.neu.util.Strings;
 import javaslang.Tuple;
 import javaslang.Tuple2;
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.LinkedHashSet;
 import javaslang.collection.List;
 import javaslang.collection.Seq;
@@ -376,7 +377,7 @@ public class Builder implements Fragments {
             .map(x -> fragment(x._1, x._2));
 
         String query = parts.map(Tuple2::_1).transform(Strings::concat).trim(); // TODO: trim is ugly
-        TreeMap<String, Parameter> params = parts.map(Tuple2::_2).flatMap(javaslang.Value::toList).transform(TreeMap::ofEntries);
+        LinkedHashMap<String, Parameter> params = parts.map(Tuple2::_2).flatMap(javaslang.Value::toList).transform(LinkedHashMap::ofEntries);
 
         return new Statement(query, new NParamMap(params));
     }

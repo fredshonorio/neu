@@ -1,15 +1,16 @@
 package com.fredhonorio.neu.type;
 
 import javaslang.Tuple2;
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.TreeMap;
 import javaslang.control.Option;
 
 import java.util.function.Function;
 
 public class NParamMap implements Parameter {
-    public final TreeMap<String, Parameter> value;
+    public final LinkedHashMap<String, Parameter> value;
 
-    public NParamMap(TreeMap<String, Parameter> value) {
+    public NParamMap(LinkedHashMap<String, Parameter> value) {
         this.value = value;
     }
 
@@ -42,31 +43,31 @@ public class NParamMap implements Parameter {
     }
 
     public static NParamMap of(String k, Parameter v) {
-        return new NParamMap(TreeMap.of(k, v));
+        return new NParamMap(LinkedHashMap.of(k, v));
     }
 
     public static NParamMap of(String k, boolean v) {
-        return new NParamMap(TreeMap.of(k, Value.nBoolean(v)));
+        return new NParamMap(LinkedHashMap.of(k, Value.nBoolean(v)));
     }
 
     public static NParamMap of(String k, String v) {
-        return new NParamMap(TreeMap.of(k, Value.nString(v)));
+        return new NParamMap(LinkedHashMap.of(k, Value.nString(v)));
     }
 
     public static NParamMap of(String k, double v) {
-        return new NParamMap(TreeMap.of(k, Value.nFloat(v)));
+        return new NParamMap(LinkedHashMap.of(k, Value.nFloat(v)));
     }
 
     public static NParamMap of(String k, long v) {
-        return new NParamMap(TreeMap.of(k, Value.nInteger(v)));
+        return new NParamMap(LinkedHashMap.of(k, Value.nInteger(v)));
     }
 
     public static NParamMap empty() {
-        return new NParamMap(TreeMap.empty());
+        return new NParamMap(LinkedHashMap.empty());
     }
 
     public static NParamMap of(Iterable<Tuple2<String, Parameter>> map) {
-        return new NParamMap(TreeMap.ofEntries(map));
+        return new NParamMap(LinkedHashMap.ofEntries(map));
     }
 
     @Override

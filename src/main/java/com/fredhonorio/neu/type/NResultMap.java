@@ -1,13 +1,14 @@
 package com.fredhonorio.neu.type;
 
+import javaslang.collection.LinkedHashMap;
 import javaslang.collection.TreeMap;
 
 import java.util.function.Function;
 
 public class NResultMap implements Result {
-    public final TreeMap<String, Result> value;
+    public final LinkedHashMap<String, Result> value;
 
-    public NResultMap(TreeMap<String, Result> value) {
+    public NResultMap(LinkedHashMap<String, Result> value) {
         this.value = value;
     }
 
@@ -40,5 +41,5 @@ public class NResultMap implements Result {
         return value != null ? value.hashCode() : 0;
     }
 
-    public static NResultMap empty = new NResultMap(TreeMap.empty());
+    public static NResultMap empty = new NResultMap(LinkedHashMap.empty());
 }

@@ -48,7 +48,7 @@ public class ParameterTest {
                 .list(parameters())
                 .apply(root)
                 .flatMap(params -> sequence(params.map(p -> genKey.map(k -> Tuple.of(k, p)))))
-                .map(entries -> new NParamMap(TreeMap.ofEntries(entries)))
+                .map(entries -> new NParamMap(LinkedHashMap.ofEntries(entries)))
                 .apply(gen);
         };
     }

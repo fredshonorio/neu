@@ -7,7 +7,9 @@ import com.fredhonorio.neu.op.Interpreters;
 import com.fredhonorio.neu.op.Ops;
 import com.fredhonorio.neu.query.*;
 import com.fredhonorio.neu.type.Label;
+import com.fredhonorio.neu.type.NNull;
 import com.fredhonorio.neu.type.NParamList;
+import com.fredhonorio.neu.type.NParamMap;
 import com.fredhonorio.neu.type.Properties;
 import com.fredhonorio.neu.type.Value;
 import javaslang.Tuple;
@@ -25,6 +27,7 @@ import static com.fredhonorio.neu.op.Ops.first;
 import static com.fredhonorio.neu.op.Ops.list;
 import static com.fredhonorio.neu.op.Ops.result;
 import static com.fredhonorio.neu.query.param.Builder.builder;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ReadTest {
@@ -85,5 +88,31 @@ public class ReadTest {
             .get();
 
         assertTrue(ids.eq(List.of("1", "2")));
+    }
+
+
+    @Test
+    public void rowDecoders() {
+
+        Interpreter tx = Interpreters.writeSession(driver);
+
+        Statement s = new Statement(
+            "RETURN 1, null, \"hello\", 5.04",
+            NParamMap.empty()
+        );
+
+        assertEquals(
+            Tuple.of(1, NNull.instance, "hello", 5.04d),
+            tx.submit(first(s,
+                ResultDecoder.row4(
+                    ResultDecoder.Integer,
+                    ResultDecoder.Null,
+                    ResultDecoder.String,
+                    ResultDecoder.Double,
+                    Tuple::of
+                ))).get()
+        );
+        ;
+
     }
 }

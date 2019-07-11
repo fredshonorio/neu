@@ -57,7 +57,7 @@ public class Read {
             new Node(
                 LinkedHashSet.ofAll(List.ofAll(node.labels()).map(Label::of)),
                 new Properties(
-                    TreeMap.ofEntries(
+                    LinkedHashMap.ofEntries(
                         List.ofAll(node.keys())
                             .toMap(k -> Tuple.of(k, propValue(node.get(k)))))))
         );
@@ -71,7 +71,7 @@ public class Read {
             new Relationship(
                 Type.of(relationship.type()),
                 new Properties(
-                    TreeMap.ofEntries(
+                    LinkedHashMap.ofEntries(
                         List.ofAll(relationship.keys())
                             .toMap(k -> Tuple.of(k, propValue(relationship.get(k)))))))
         );
